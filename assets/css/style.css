@@ -365,7 +365,6 @@ body:not(.hh) .hh-on, body.hh .hh-off { display: none; }
 }
 .pcard-name .veg { width: 18px; height: 18px; font-size: 10.5px; vertical-align: 4px; }
 .notices li.veg-legend { color: var(--muted); }
-.notices li.allergy { margin: 12px 0 14px; font-size: 13.5px; line-height: 1.5; color: #d9d2c4; }
 .veg-legend .veg { margin: 0 2px 0 0; }
 .age { margin: 14px 0 0; font-size: 12.5px; line-height: 1.7; color: var(--muted); }
 .age-badge { display: inline-block; padding: 0 6px; line-height: 1.5; border-radius: 6px; border: 1px solid var(--gold-line); color: var(--gold); font-size: 11px; font-weight: 800; letter-spacing: 0.02em; }

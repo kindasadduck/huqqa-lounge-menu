@@ -464,7 +464,7 @@ window.MENU = {
     },
   ],
 
-  // Shown under the halal line, larger and brighter than the other notices.
+  // Shown under the halal line and the V legend.
   allergy: ["Our food may contain milk, eggs, wheat, soybean, tree nuts, peanuts, sesame or fish. Please tell your server about any allergies.",
     "Yemeklerimiz süt, yumurta, buğday, soya, sert kabuklu yemiş, yer fıstığı, susam veya balık içerebilir. Alerjiniz varsa lütfen garsonunuza bildirin."],
 
