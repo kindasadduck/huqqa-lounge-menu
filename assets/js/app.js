@@ -42,6 +42,7 @@
     star: '<svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>',
     insta: '<svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.6"/></svg>',
     wifi: '<svg viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0119 0M5.5 12.5a9.5 9.5 0 0113 0M8.6 15.8a5 5 0 016.8 0"/><circle cx="12" cy="19" r="0.8"/></svg>',
+    clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
     cup: '<svg viewBox="0 0 24 24"><path d="M5 9h12v5a5 5 0 01-5 5h-2a5 5 0 01-5-5V9zM17 10h1.5a2.5 2.5 0 010 5H17M9 3v3M13 3v3"/></svg>',
   };
 
@@ -343,7 +344,7 @@
     else body = carousel(s) + s.groups.map((g) => group(g)).join("");
     return `
       <section class="section" id="${s.id}">
-        <div class="section-head"><h2>${esc(L(s.title))}</h2>${s.brandFilter ? brandButtons(s) : `<span class="section-tag">${esc(L(s.tag))}</span>`}</div>
+        <div class="section-head"><h2>${esc(L(s.title))}</h2>${s.brandFilter ? brandButtons(s) : s.badge ? `<span class="sec-badge">${ICON.clock}${esc(L(s.badge))}</span>` : `<span class="section-tag">${esc(L(s.tag))}</span>`}</div>
         ${body}
       </section>`;
   };
@@ -867,6 +868,11 @@
     if (e.target.closest("#searchToggle")) { setSearchOpen($("#searchRow").hidden); return; }
     if (e.target.closest("#searchClear")) { setSearchOpen(false); return; }
     if (e.target.closest("#toTop, [data-scroll-top]")) { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  });
+
+  // No "save image" menu on long-press / right-click over photos (see the img rule in style.css).
+  document.addEventListener("contextmenu", (e) => {
+    if (e.target.closest(".pcard, .gcard, .thumb, .dhero-photo, #lightbox")) e.preventDefault();
   });
 
   $("#searchInput").addEventListener("input", () => {

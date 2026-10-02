@@ -258,6 +258,8 @@ window.MENU = {
       id: "oven",
       title: ["Oven", "Fırın"],
       tag: ["Pide, lahmacun and pizza", "Pide, lahmacun ve pizza"],
+      // Shown as a gold badge beside the title instead of the tag.
+      badge: ["Available after 7 PM", "19:00'dan sonra"],
       carousel: ["Lahmacun", "Huqqa Mixed Pizza", "Steak and Cheese Stuffed Pide"],
       layout: "grid",
       groups: [
