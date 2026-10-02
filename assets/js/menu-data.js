@@ -343,6 +343,7 @@ window.MENU = {
         },
         {
           title: ["Espresso bar", "Espresso bar"],
+          rail: true,
           items: [
             d(["Latte", "Latte"], "$8.50", "latte-vanilla", {
               temps: true, flavors: SYRUPS,
