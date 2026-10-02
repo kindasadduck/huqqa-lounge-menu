@@ -98,7 +98,7 @@
   // Three copies of the cards so the rail can loop seamlessly in both directions;
   // the outer copies are hidden from assistive tech and keyboard focus.
   const rail = (cards, extraClass = "") => {
-    const clones = cards.map((c) => c.replace("<button ", '<button aria-hidden="true" tabindex="-1" ')).join("");
+    const clones = cards.map((c) => c.replace(/^(\s*<\w+) /, '$1 aria-hidden="true" tabindex="-1" ')).join("");
     return `<div class="rail ${extraClass}" data-count="${cards.length}">${clones}${cards.join("")}${clones}</div>`;
   };
 
@@ -268,12 +268,13 @@
       <div class="dslot"></div>`;
   };
 
-  // Grid groups use the food card grid (taller cards, or all full-width with g.wide); rail groups swipe sideways.
+  // Grid groups use the food card grid (taller cards, or all full-width with g.wide); rail groups are
+  // looping, drifting rails like the best sellers.
   const drinksGroup = (g) => `
     <div class="group">
       ${g.title ? `<h3 class="sub">${esc(L(g.title))}</h3>` : ""}
       ${g.rail
-        ? `<div class="drail">${g.items.map((it) => drinkCard(it)).join("")}</div><div class="dslot"></div>`
+        ? `${rail(g.items.map((it) => drinkCard(it)), "drail")}<div class="dslot"></div>`
         : `<div class="grid dgrid">${g.items.map((it, n) => drinkCard(it, g.wide || (n === 0 && g.items.length % 2 === 1))).join("")}</div>`}
       ${note(g.note)}
     </div>`;
@@ -299,7 +300,7 @@
     $$(".dchip", inner).forEach((c) => c.setAttribute("aria-pressed",
       String(c.dataset.kind === "temp" ? s.iced === (c.dataset.val === "1") : s.opt === +c.dataset.val)));
     if (it.sizes) $(".gbar-head .price", inner).textContent = it.sizes[s.opt][1];
-    if (openCard) swapPhoto(openCard, drinkPhoto(it));
+    $$(`.gcard[data-drink="${n}"]`).forEach((c) => swapPhoto(c, drinkPhoto(it))); // rail clones too
   }
 
   function pickTile(tile) {
@@ -523,6 +524,7 @@
     const idle = !reduceMotion.matches && lb.hidden && !document.body.classList.contains("searching");
     for (const r of rails) {
       if (!idle || !r.visible || r.touching || now < r.pausedUntil) continue;
+      if (openCard && r.el.contains(openCard)) continue; // hold still while a drink's details bar is open
       r.pos += SPEED * dt;
       r.el.scrollLeft = r.pos;
       if (r.el.scrollLeft >= 2 * (r.el.children[+r.el.dataset.count].offsetLeft - r.el.children[0].offsetLeft)) r.wrap();
@@ -645,6 +647,7 @@
     const empty = $("#empty");
     empty.hidden = !q || any;
     if (!empty.hidden) empty.textContent = L(UI.noResults).replace("{q}", $("#searchInput").value.trim());
+    if (!q) rails.forEach((r) => r.wrap()); // drink rails hid their clones while searching
     activeId = null;
     updateActive();
   }
@@ -682,7 +685,12 @@
     if (tile) { pickTile(tile); return; }
 
     const card = e.target.closest(".gcard[aria-expanded]");
-    if (card) { toggleCard(card); return; }
+    if (card) {
+      const r = rails.find((x) => x.el === card.parentElement);
+      if (r) { r.pausedUntil = performance.now() + RESUME_MS; r.align(card); }
+      toggleCard(card);
+      return;
+    }
 
     if (e.target.closest("#lightbox")) { closeLightbox(); return; }
 

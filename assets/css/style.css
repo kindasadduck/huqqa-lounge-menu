@@ -252,10 +252,9 @@ img { display: block; }
 .drail {
   display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none;
   margin: 0 calc(-1 * var(--gutter)); padding: 0 var(--gutter);
-  scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter);
 }
 .drail::-webkit-scrollbar { display: none; }
-.drail .gcard { flex: 0 0 42%; height: auto; aspect-ratio: 3 / 4; scroll-snap-align: start; }
+.drail .gcard { flex: 0 0 42%; height: auto; aspect-ratio: 3 / 4; }
 .dph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--faint); background: linear-gradient(160deg, #1f1b16, #121009); }
 .dph svg { width: 32px; height: 32px; stroke-width: 1.3; }
 .dcount, .dtemp {
@@ -329,7 +328,7 @@ body:not(.hh) .hh-on, body.hh .hh-off { display: none; }
 .tab.pinned[aria-current="true"] .hh-badge { background: #1c1609; color: var(--gold); }
 
 /* Search ---------------------------------------------------------------- */
-body.searching .rail, body.searching .hero, body.searching #featured { display: none; }
+body.searching .rail:not(.drail), body.searching .drail > [aria-hidden="true"], body.searching .hero, body.searching #featured { display: none; }
 .empty-state { padding: 60px var(--gutter); text-align: center; color: var(--muted); }
 
 /* Footer ---------------------------------------------------------------- */
