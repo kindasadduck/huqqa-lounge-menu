@@ -24,6 +24,14 @@
     size: ["Size", "Boy"],
     flavors: ["Flavors", "Aromalar"],
     tapPreview: ["Tap an option to see it.", "Görmek için bir seçeneğe dokunun."],
+    vegetarian: ["Vegetarian", "Vejetaryen"],
+    hours: ["Hours", "Çalışma saatleri"],
+    rateUs: ["Rate us on Google", "Google'da değerlendirin"],
+    wifi: ["Wi-Fi", "Wi-Fi"],
+    network: ["Network", "Ağ"],
+    password: ["Password", "Şifre"],
+    copy: ["Copy", "Kopyala"],
+    copied: ["Copied", "Kopyalandı"],
   };
 
   const ICON = {
@@ -31,6 +39,9 @@
     chevron: '<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>',
     hot: '<svg viewBox="0 0 24 24"><path d="M8 3c-1 1.5 1 2.5 0 4M12 3c-1 1.5 1 2.5 0 4M16 3c-1 1.5 1 2.5 0 4M4 10h14v4a6 6 0 01-6 6h-2a6 6 0 01-6-6v-4zM18 11h1a2 2 0 010 4h-1"/></svg>',
     iced: '<svg viewBox="0 0 24 24"><path d="M12 2v20M4 6.5l16 11M20 6.5l-16 11M9 3.5l3 2.5 3-2.5M9 20.5l3-2.5 3 2.5"/></svg>',
+    star: '<svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>',
+    insta: '<svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.6"/></svg>',
+    wifi: '<svg viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0119 0M5.5 12.5a9.5 9.5 0 0113 0M8.6 15.8a5 5 0 016.8 0"/><circle cx="12" cy="19" r="0.8"/></svg>',
     cup: '<svg viewBox="0 0 24 24"><path d="M5 9h12v5a5 5 0 01-5 5h-2a5 5 0 01-5-5V9zM17 10h1.5a2.5 2.5 0 010 5H17M9 3v3M13 3v3"/></svg>',
   };
 
@@ -41,7 +52,12 @@
   const L = (pair) => (pair ? pair[lang === "tr" ? 1 : 0] : "");
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const fold = (s) => s.toLocaleLowerCase("tr").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/ı/g, "i");
-  const img = (slug, size) => `assets/img/${slug}${size === "sm" ? "-sm" : ""}.webp`;
+  const img = (slug, size) => `assets/img/${slug}${size ? `-${size}` : ""}.webp`;
+  // Cards load the 800px photo on most phones and the 1200px one on dense screens. `sizes` is about how
+  // wide the photo is drawn (object-fit: cover on a short card draws it wider than the card itself).
+  const srcset = (slug) => `${img(slug, "md")} 800w, ${img(slug)} 1200w`;
+  const pic = (slug, sizes) => `src="${img(slug)}" srcset="${srcset(slug)}" sizes="${sizes}"`;
+  const FULL = "min(100vw, 560px)";
   const findItem = (sectionId, name) => {
     const s = M.sections.find((x) => x.id === sectionId);
     for (const g of s.groups) for (const it of g.items) if (it.name[0] === name) return [it, s];
@@ -49,19 +65,21 @@
   };
 
   // ---- rendering ----------------------------------------------------------
-  const photoCard = (it, kicker) => `
+  const veg = (it) => (it.veg ? ` <span class="veg" title="${esc(L(UI.vegetarian))}" aria-label="${esc(L(UI.vegetarian))}">V</span>` : "");
+
+  const photoCard = (it, kicker, sizes = "350px") => `
     <button type="button" class="pcard" data-photo="${it.img}" data-name="${esc(L(it.name))}" data-price="${esc(it.price)}">
-      <img src="${img(it.img)}" alt="" loading="lazy">
+      <img loading="lazy" ${pic(it.img, sizes)} alt="">
       <div class="pcard-body">
         ${kicker ? `<div class="kicker">${esc(kicker)}</div>` : ""}
-        <div class="pcard-name">${esc(L(it.name))}</div>
+        <div class="pcard-name">${esc(L(it.name))}${veg(it)}</div>
         ${it.desc ? `<div class="pcard-desc">${esc(L(it.desc))}</div>` : ""}
         <div class="pcard-price">${esc(it.price)}</div>
       </div>
     </button>`;
 
   // Names and descriptions in both languages, so "adana" also finds the Huqqa Mix Kebab.
-  const searchKey = (it) => esc(fold([...it.name, ...(it.desc || []), ...(it.extra || [])].join(" ")));
+  const searchKey = (it) => esc(fold([...it.name, ...(it.desc || []), ...(it.extra || []), ...(it.veg ? UI.vegetarian : [])].join(" ")));
 
   const row = (it) => {
     const thumb = it.img
@@ -72,7 +90,7 @@
       <div class="row" data-search="${searchKey(it)}">
         ${thumb}
         <div>
-          <div class="row-name">${esc(L(it.name))}</div>
+          <div class="row-name">${esc(L(it.name))}${veg(it)}</div>
           ${it.desc ? `<div class="row-desc">${esc(L(it.desc))}</div>` : ""}
           ${it.extra ? `<div class="row-extra">${esc(L(it.extra))}</div>` : ""}
         </div>
@@ -82,7 +100,7 @@
 
   const plainRow = (it) => `
     <div class="row plain" data-search="${searchKey(it)}"${it.brands ? ` data-brands="${esc(it.brands.join("|"))}"` : ""}>
-      <div class="row-name">${esc(L(it.name))}</div>
+      <div class="row-name">${esc(L(it.name))}${veg(it)}</div>
       <div class="price">${esc(it.price)}</div>
     </div>`;
 
@@ -121,10 +139,10 @@
     return `
       <${tag} class="gcard${wide ? " wide" : ""}" ${attrs} data-search="${searchKey(it)}"
               data-name="${esc(L(it.name))}" data-price="${esc(it.price)}">
-        <img src="${img(it.img)}" alt="" loading="lazy"${it.focus ? ` style="object-position: ${it.focus} 50%"` : ""}>
+        <img loading="lazy" ${pic(it.img, wide ? FULL : "264px")} alt=""${it.focus ? ` style="object-position: ${it.focus} 50%"` : ""}>
         <div class="gcard-body">
           <div class="gcard-text">
-            <div class="gcard-name">${esc(L(it.name))}</div>
+            <div class="gcard-name">${esc(L(it.name))}${veg(it)}</div>
             <div class="gcard-price">${esc(it.price)}</div>
           </div>
           ${tappable ? `<span class="gcard-arrow" aria-hidden="true">${ICON.chevron}</span>` : ""}
@@ -182,7 +200,8 @@
         <div class="tier-head"><h3>${esc(L(t.title))}</h3>${tierPrice(t.price, s.happyHour && t.hhDiscount)}</div>
         <div class="flavors">${t.flavors.map((f) => `<span class="flavor" data-search="${esc(fold(f))}" data-brands="${esc(brandOf(t, f))}">${esc(f)}</span>`).join("")}</div>
       </div>`).join("");
-    return hhTestSwitch() + happyHour(s.happyHour) + tiers + s.groups.map((g) => group(g, plainRow)).join("");
+    const age = s.age ? `<p class="age">${esc(L(s.age)).replace("{21}", '<span class="age-badge">21+</span>')}</p>` : "";
+    return hhTestSwitch() + happyHour(s.happyHour) + tiers + s.groups.map((g) => group(g, plainRow)).join("") + age;
   };
 
   // ---- drinks -------------------------------------------------------------
@@ -211,7 +230,7 @@
     const photo = drinkPhoto(it);
     return `
       <${tag} class="gcard${wide ? " wide" : ""}" ${attrs} data-search="${drinkSearch(it)}">
-        ${photo ? `<img src="${img(photo)}" alt="" loading="lazy"${it.focus ? ` style="object-position: ${it.focus} 50%"` : ""}>` : `<span class="dph" aria-hidden="true">${ICON.cup}</span>`}
+        ${photo ? `<img loading="lazy" ${pic(photo, wide ? FULL : "320px")} alt=""${it.focus ? ` style="object-position: ${it.focus} 50%"` : ""}>` : `<span class="dph" aria-hidden="true">${ICON.cup}</span>`}
         ${it.temps ? `<span class="dtemp" aria-hidden="true">${ICON.hot}${ICON.iced}</span>` : ""}
         ${it.flavors && it.flavors.length > 2 ? `<span class="dcount">${it.flavors.length} ${esc(L(UI.flavorCount))}</span>` : ""}
         <div class="gcard-body">
@@ -258,7 +277,7 @@
     const words = [h.title].concat(...h.tiles.map((t) => [t.name, t.search, t.more && t.more.name].concat(t.more ? t.more.flavors : [])));
     return `
       <div class="dhero" data-search="${esc(fold(words.filter(Boolean).flat().join(" ")))}">
-        <div class="dhero-photo"><img src="${img(h.tiles[heroPick].img)}" alt=""></div>
+        <div class="dhero-photo"><img ${pic(h.tiles[heroPick].img, FULL)} alt=""></div>
         <div class="dhero-body">
           <div class="kicker">${esc(L(h.kicker))}</div>
           <h3>${esc(L(h.title))}</h3>
@@ -285,8 +304,11 @@
     const im = $("img", el);
     if (!im || im.getAttribute("src") === img(slug)) return;
     const next = new Image();
+    next.sizes = im.sizes;
+    next.srcset = srcset(slug);
     next.src = img(slug);
     next.decode().catch(() => {}).then(() => {
+      im.srcset = next.srcset;
       im.src = next.src;
       im.animate([{ opacity: 0.35 }, { opacity: 1 }], { duration: 260, easing: "ease-out" });
     });
@@ -329,7 +351,7 @@
   const featured = () => {
     const cards = M.featured.map(([sid, name]) => {
       const [it, s] = findItem(sid, name);
-      return photoCard(it, L(s.tabTitle || s.title));
+      return photoCard(it, L(s.tabTitle || s.title), "450px");
     });
     return `
       <section class="section" id="featured">
@@ -338,19 +360,40 @@
       </section>`;
   };
 
+  // Wi-Fi details open in a small panel under the title.
+  const wifiPanel = (w) => `
+    <div class="wifi-panel" id="wifiPanel" hidden>
+      <div><span>${esc(L(UI.network))}</span><b>${esc(w.network)}</b></div>
+      <div><span>${esc(L(UI.password))}</span><b>${esc(w.password)}</b>
+        <button type="button" class="copy-btn" data-copy="${esc(w.password)}">${esc(L(UI.copy))}</button></div>
+    </div>`;
+
   const hero = () => `
     <div class="hero">
       <h1>${L(UI.ourMenu)}</h1>
-      <span class="halal">${ICON.check}${esc(L(UI.halal))}</span>
-    </div>`;
+      <div class="hero-side">
+        <span class="halal">${ICON.check}${esc(L(UI.halal))}</span>
+        <button type="button" class="wifi-btn" aria-expanded="false" aria-controls="wifiPanel">${ICON.wifi}${esc(L(UI.wifi))}</button>
+      </div>
+    </div>
+    ${wifiPanel(M.info.wifi)}`;
 
+  const vegLegend = () => `<li class="veg-legend"><span class="veg" aria-hidden="true">V</span> ${esc(L(UI.vegetarian))}</li>`;
   const footer = () => `
     <h2>${esc(L(UI.thanks))}</h2>
     <div class="foot-contact">
       <a href="${M.info.mapsHref}" target="_blank" rel="noopener">${esc(M.info.address)}</a><br>
       <a href="${M.info.phoneHref}">${esc(M.info.phone)}</a>
     </div>
-    <ul class="notices">${M.notices.map((n) => `<li>${esc(L(n))}</li>`).join("")}</ul>`;
+    <h3 class="foot-sub">${esc(L(UI.hours))}</h3>
+    <dl class="hours">${M.info.hours.map(([d, t]) => `<dt>${esc(L(d))}</dt><dd>${esc(L(t))}</dd>`).join("")}</dl>
+    <p class="kitchen-note">${esc(L(M.info.kitchen.note))}</p>
+    <div class="foot-links">
+      <a href="${M.info.reviewHref}" target="_blank" rel="noopener">${ICON.star}${esc(L(UI.rateUs))}</a>
+      <a href="${M.info.instagramHref}" target="_blank" rel="noopener">${ICON.insta}${esc(M.info.instagram)}</a>
+    </div>
+    <div class="foot-wifi">${ICON.wifi}<span>${esc(M.info.wifi.network)}</span>·<span>${esc(L(UI.password))}: <b>${esc(M.info.wifi.password)}</b></span></div>
+    <ul class="notices">${M.notices.map((n, k) => `<li>${esc(L(n))}</li>` + (k === 0 ? vegLegend() + `<li class="allergy">${esc(L(M.allergy))}</li>` : "")).join("")}</ul>`;
 
   // The pinned section (hookah) is left out of the scrolling tab list; it has its own tab on the right.
   const PINNED = "hookah";
@@ -369,7 +412,7 @@
     const pinned = M.sections.find((x) => x.id === PINNED);
     $("#pinnedTab").innerHTML = esc(L(pinned.title)) +
       (pinned.happyHour ? ` <span class="hh-badge hh-on">HH</span>` : "");
-    $("#menu").innerHTML = hero() + featured() + M.sections.map(section).join("") +
+    $("#menu").innerHTML = `<div class="kitchen" id="kitchen" hidden></div>` + hero() + featured() + M.sections.map(section).join("") +
       `<div class="empty-state" id="empty" hidden></div>`;
     $("#foot").innerHTML = footer();
     openCard = null;
@@ -379,6 +422,7 @@
     updateActive();
     setupRails();
     updateHappyHour();
+    updateKitchen();
     applyBrand();
   }
 
@@ -407,7 +451,39 @@
       ends.textContent = L(hh.endsIn).replace("{t}", t);
     }
   }
-  setInterval(updateHappyHour, 60 * 1000);
+  // ---- kitchen closing (Virginia time) ------------------------------------
+  // In the last 30 minutes before the kitchen closes a strip at the top counts down; after that,
+  // until the lounge closes, it says the kitchen is closed. ?kitchen=soon / ?kitchen=closed forces it.
+  let kitchenTest = null; // TEST ONLY (remove later): set by the Soon / Closed buttons in the header
+  function updateKitchen() {
+    const k = M.info.kitchen, el = $("#kitchen");
+    if (!k || !el) return;
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York", weekday: "short", hour: "numeric", minute: "numeric", hourCycle: "h23",
+    }).formatToParts(new Date()).map((p) => [p.type, p.value]));
+    let day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(parts.weekday);
+    let mins = +parts.hour * 60 + +parts.minute;
+    if (+parts.hour < 6) { day = (day + 6) % 7; mins += 24 * 60; } // after midnight still belongs to the evening before
+    const close = k.closes[day] * 60, kitchen = close - 60;
+    const forced = kitchenTest || new URLSearchParams(location.search).get("kitchen");
+    $$("[data-kt]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.kt === kitchenTest))); // TEST ONLY
+    if (forced === "soon") mins = kitchen - 25;
+    if (forced === "closed") mins = kitchen + 5;
+    const at = (m) => {
+      const h = Math.floor(m / 60) % 24;
+      return lang === "tr" ? `${String(h).padStart(2, "0")}:00` : `${h % 12 || 12} ${h < 12 ? "AM" : "PM"}`;
+    };
+    let text = "";
+    if (mins >= kitchen - 30 && mins < kitchen) {
+      const left = kitchen - mins;
+      text = L(k.soon).replace("{k}", at(kitchen)).replace("{t}", lang === "tr" ? `${left} dk` : `${left} min`);
+    } else if (mins >= kitchen && mins < close) text = L(k.closed).replace("{c}", at(close));
+    el.hidden = !text;
+    el.classList.toggle("closed", mins >= kitchen);
+    el.textContent = text;
+  }
+
+  setInterval(() => { updateHappyHour(); updateKitchen(); }, 60 * 1000);
 
   // ---- header height & scroll spy ----------------------------------------
   let headerH = 0;
@@ -455,18 +531,21 @@
   }
 
   // ---- auto-scrolling rails ---------------------------------------------
-  // Rails drift right at a slow, constant speed and wrap around. Any touch, drag,
+  // Rails drift right at a slow, constant speed and wrap around. A sideways swipe, drag,
   // wheel or manual scroll pauses that rail; it resumes RESUME_MS after the last
   // interaction.
   const SPEED = 24; // px per second
+  const DRINK_SPEED = 12; // drink rails drift slower so names and prices are easy to read
   const RESUME_MS = 9000;
+  const RAMP_S = 1.6; // seconds to ease from standstill back to SPEED
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let rails = [];
 
   function setupRails() {
     rails.forEach((r) => r.observer.disconnect());
     rails = $$(".rail").map((el) => {
-      const r = { el, pos: 0, pausedUntil: 0, touching: false, visible: true, idleTimer: 0 };
+      const r = { el, pos: 0, pausedUntil: 0, touching: false, visible: true, idleTimer: 0,
+        speed: el.classList.contains("drail") ? DRINK_SPEED : SPEED };
       const setWidth = () => {
         const n = +el.dataset.count;
         return el.children[n].offsetLeft - el.children[0].offsetLeft;
@@ -495,10 +574,20 @@
       el.scrollLeft = setWidth();
       r.pos = el.scrollLeft;
 
-      el.addEventListener("touchstart", () => { r.touching = true; hold(); }, { passive: true });
-      el.addEventListener("touchend", () => { r.touching = false; hold(); }, { passive: true });
-      el.addEventListener("pointerdown", hold);
-      el.addEventListener("wheel", hold, { passive: true });
+      // Only a sideways swipe pauses the rail; scrolling the page up or down over it leaves it drifting.
+      let start = null;
+      el.addEventListener("touchstart", (e) => { start = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }, { passive: true });
+      el.addEventListener("touchmove", (e) => {
+        if (!start || r.touching) return;
+        const dx = Math.abs(e.touches[0].clientX - start.x), dy = Math.abs(e.touches[0].clientY - start.y);
+        if (dx > 8 && dx > dy) { r.touching = true; hold(); }
+        else if (dy > 8) start = null;
+      }, { passive: true });
+      const release = () => { if (r.touching) { r.touching = false; hold(); } start = null; };
+      el.addEventListener("touchend", release, { passive: true });
+      el.addEventListener("touchcancel", release, { passive: true });
+      el.addEventListener("pointerdown", (e) => { if (e.pointerType === "mouse") hold(); });
+      el.addEventListener("wheel", (e) => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) hold(); }, { passive: true });
       el.addEventListener("scroll", () => {
         if (Math.abs(el.scrollLeft - r.pos) < 2) return; // our own autoplay step
         hold();
@@ -523,9 +612,14 @@
     lastFrame = now;
     const idle = !reduceMotion.matches && lb.hidden && !document.body.classList.contains("searching");
     for (const r of rails) {
-      if (!idle || !r.visible || r.touching || now < r.pausedUntil) continue;
-      if (openCard && r.el.contains(openCard)) continue; // hold still while a drink's details bar is open
-      r.pos += SPEED * dt;
+      // Hold still while paused or while a drink's details bar is open under this rail.
+      if (!idle || !r.visible || r.touching || now < r.pausedUntil || (openCard && r.el.contains(openCard))) {
+        r.ramp = 0;
+        continue;
+      }
+      // After every stop the rail eases back up to full speed instead of jumping straight to it.
+      r.ramp = Math.min(1, (r.ramp || 0) + dt / RAMP_S);
+      r.pos += r.speed * dt * r.ramp * r.ramp * (3 - 2 * r.ramp);
       r.el.scrollLeft = r.pos;
       if (r.el.scrollLeft >= 2 * (r.el.children[+r.el.dataset.count].offsetLeft - r.el.children[0].offsetLeft)) r.wrap();
     }
@@ -556,30 +650,59 @@
     bar.style.setProperty("--caret", `${x}px`);
   }
 
+  const barHTML = (card) => {
+    if (card.dataset.drink) {
+      const it = drinkList[+card.dataset.drink];
+      Object.values(it.v || {}).forEach((slug) => { // warm up option photos
+        const im = new Image();
+        im.sizes = (card.querySelector("img") || {}).sizes || "320px";
+        im.srcset = srcset(slug);
+      });
+      return drinkBar(+card.dataset.drink);
+    }
+    return `<div class="gbar-inner"><div class="gbar-head"><span>${card.dataset.name}</span><span class="price">${card.dataset.price}</span></div>
+      ${card.dataset.desc ? `<div class="gbar-desc">${card.dataset.desc}</div>` : ""}
+      ${card.dataset.extra ? `<div class="row-extra">${card.dataset.extra}</div>` : ""}</div>`;
+  };
+
+  // Height animates to the bar's content, then goes back to auto so later changes (picked options) fit.
+  function growBar(bar, card) {
+    bar.style.height = `${bar.scrollHeight}px`;
+    bar.addEventListener("transitionend", () => { if (bar.isConnected && card === openCard) bar.style.height = "auto"; }, { once: true });
+  }
+
   function toggleCard(card) {
     if (card === openCard) { closeBar(true); return; }
+    // Rails and the tea banner keep their bar in the slot right below them; grids put it under the card's row.
+    const host = card.closest(".drail, .dhero");
+    const rowEnd = host ? null : $$(".gcard", card.parentElement).filter((c) => !c.hidden && c.offsetTop === card.offsetTop).pop();
+    const old = $(".gbar:not(.closing)");
+
+    // A bar already open in the same spot (e.g. Tea Pot -> Flavored Tea) changes its content in place.
+    if (old && (host ? old.parentElement === host.nextElementSibling : old.previousElementSibling === rowEnd)) {
+      if (openCard) openCard.setAttribute("aria-expanded", "false");
+      old.style.height = `${old.offsetHeight}px`;
+      old.offsetHeight; // commit the pixel height so the change animates from it
+      old.innerHTML = barHTML(card);
+      openCard = card;
+      card.setAttribute("aria-expanded", "true");
+      positionCaret();
+      old.firstElementChild.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: "ease-out" });
+      if (old.scrollHeight === old.offsetHeight) old.style.height = "auto"; // same height: nothing to animate
+      else growBar(old, card);
+      return;
+    }
+
     closeBar(false);
     const bar = document.createElement("div");
     bar.className = "gbar";
-    if (card.dataset.drink) {
-      const it = drinkList[+card.dataset.drink];
-      bar.innerHTML = drinkBar(+card.dataset.drink);
-      Object.values(it.v || {}).forEach((slug) => { new Image().src = img(slug); }); // warm up option photos
-    } else bar.innerHTML = `<div class="gbar-inner"><div class="gbar-head"><span>${card.dataset.name}</span><span class="price">${card.dataset.price}</span></div>
-      ${card.dataset.desc ? `<div class="gbar-desc">${card.dataset.desc}</div>` : ""}
-      ${card.dataset.extra ? `<div class="row-extra">${card.dataset.extra}</div>` : ""}</div>`;
-    // Rails and the tea banner keep their bar in the slot right below them; grids put it under the card's row.
-    const host = card.closest(".drail, .dhero");
+    bar.innerHTML = barHTML(card);
     if (host) host.nextElementSibling.append(bar);
-    else {
-      const visible = $$(".gcard", card.parentElement).filter((c) => !c.hidden);
-      visible.filter((c) => c.offsetTop === card.offsetTop).pop().after(bar);
-    }
+    else rowEnd.after(bar);
     openCard = card;
     card.setAttribute("aria-expanded", "true");
     positionCaret();
-    requestAnimationFrame(() => { bar.style.height = `${bar.scrollHeight}px`; });
-    bar.addEventListener("transitionend", () => { if (bar.isConnected && card === openCard) bar.style.height = "auto"; }, { once: true });
+    requestAnimationFrame(() => growBar(bar, card));
   }
 
   // ---- lightbox -----------------------------------------------------------
@@ -643,7 +766,7 @@
       s.hidden = !hit;
       any = any || hit;
     });
-    $$(".section .note").forEach((n) => (n.hidden = !!q));
+    $$(".section .note, .section .age").forEach((n) => (n.hidden = !!q));
     const empty = $("#empty");
     empty.hidden = !q || any;
     if (!empty.hidden) empty.textContent = L(UI.noResults).replace("{q}", $("#searchInput").value.trim());
@@ -660,6 +783,21 @@
     measureHeader();
   }
 
+  // Clipboard API needs https; the textarea fallback covers the plain-http local preview.
+  async function copyText(btn) {
+    const text = btn.dataset.copy;
+    try { await navigator.clipboard.writeText(text); } catch (_) {
+      const ta = Object.assign(document.createElement("textarea"), { value: text });
+      document.body.append(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+    btn.textContent = L(UI.copied);
+    btn.classList.add("done");
+    setTimeout(() => { btn.textContent = L(UI.copy); btn.classList.remove("done"); }, 1600);
+  }
+
   // ---- events -------------------------------------------------------------
   document.addEventListener("click", (e) => {
     const tab = e.target.closest(".tab");
@@ -670,6 +808,24 @@
       const r = rails.find((x) => x.el === photo.parentElement);
       if (r) { r.pausedUntil = performance.now() + RESUME_MS; r.align(photo); }
       openLightbox(photo);
+      return;
+    }
+
+    const wifiBtn = e.target.closest(".wifi-btn");
+    if (wifiBtn) {
+      const open = $("#wifiPanel").hidden;
+      $("#wifiPanel").hidden = !open;
+      wifiBtn.setAttribute("aria-expanded", String(open));
+      return;
+    }
+    const copyBtn = e.target.closest(".copy-btn");
+    if (copyBtn) { copyText(copyBtn); return; }
+
+    const kt = e.target.closest("[data-kt]"); // TEST ONLY
+    if (kt) {
+      kitchenTest = kitchenTest === kt.dataset.kt ? null : kt.dataset.kt;
+      updateKitchen();
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 

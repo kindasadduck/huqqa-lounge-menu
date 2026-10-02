@@ -5,7 +5,8 @@ Usage:
 
 Every PNG/JPG/WebP under the given directories (plus source/drinks) becomes:
     assets/img/<slug>-sm.webp   160x160 center crop, for row thumbnails
-    assets/img/<slug>.webp      1200px on the long side, for cards and the lightbox
+    assets/img/<slug>-md.webp   800px on the long side, for cards on most phones (picked via srcset)
+    assets/img/<slug>.webp      1200px on the long side, for high-density screens and the lightbox
 The slug is derived from the file name, so menu-data.js refers to photos by slug.
 """
 
@@ -34,6 +35,10 @@ def convert(src: Path) -> str:
     large = img.copy()
     large.thumbnail((1200, 1200), Image.LANCZOS)
     large.save(OUT / f"{slug}.webp", "WEBP", quality=78, method=6)
+
+    medium = img.copy()
+    medium.thumbnail((800, 800), Image.LANCZOS)
+    medium.save(OUT / f"{slug}-md.webp", "WEBP", quality=76, method=6)
 
     thumb = ImageOps.fit(img, (160, 160), Image.LANCZOS)
     thumb.save(OUT / f"{slug}-sm.webp", "WEBP", quality=80, method=6)

@@ -5,6 +5,8 @@
 
 const i = (name, price, img, desc, extra, focus) => ({ name, price, img, desc, extra, focus });
 const d = (name, price, img, opts = {}) => ({ name, price, img, ...opts });
+// v(i(...)) marks a dish as vegetarian (shows a small "V").
+const v = (item) => ({ ...item, veg: true });
 // Photo map for a drink that has one photo per flavor, hot and (optionally) iced.
 const variants = (flavors, hot, iced) => Object.fromEntries(flavors.flatMap((f) => {
   const slug = f.toLowerCase().replace(/ /g, "-");
@@ -20,6 +22,26 @@ window.MENU = {
     phoneHref: "tel:+17034392222",
     address: "2828 Fallfax Dr, Falls Church, VA 22042",
     mapsHref: "https://maps.google.com/?q=2828+Fallfax+Dr,+Falls+Church,+VA+22042",
+    // Hours from Apple Maps (2026-10-02); huqqalounge.com shows older hours (closing 12 AM, Sat 11 AM).
+    hours: [
+      [["Mon – Thu", "Pzt – Prş"], ["11 AM – 1 AM", "11:00 – 01:00"]],
+      [["Friday", "Cuma"], ["11 AM – 2 AM", "11:00 – 02:00"]],
+      [["Saturday", "Cumartesi"], ["9 AM – 2 AM", "09:00 – 02:00"]],
+      [["Sunday", "Pazar"], ["9 AM – 1 AM", "09:00 – 01:00"]],
+    ],
+    // The kitchen closes 1 hour before the lounge. closes: lounge closing hour per weekday (0 = Sunday),
+    // counted from that day's midnight, so 25 = 1 AM the next morning.
+    kitchen: {
+      closes: [25, 25, 25, 25, 25, 26, 26],
+      note: ["Kitchen closes 1 hour before closing.", "Mutfak, kapanıştan 1 saat önce kapanır."],
+      soon: ["Kitchen closes at {k} · last food orders in {t}", "Mutfak kapanışı {k} · son yemek siparişi için {t} kaldı"],
+      closed: ["Kitchen is closed for tonight · drinks, select desserts and hookah until {c}. Please ask your server.",
+        "Mutfak bu akşamlık kapandı · içecek, seçili tatlılar ve nargile servisi devam ediyor (kapanış {c}). Lütfen garsonunuza sorun."],
+    },
+    reviewHref: "https://search.google.com/local/writereview?placeid=ChIJscdLSLtLtokRQZRE9cWgQ4M",
+    instagram: "@huqqaloungeva",
+    instagramHref: "https://www.instagram.com/huqqaloungeva",
+    wifi: { network: "HuqqaLounge-Guest", password: "washington" },
   },
 
   // Featured tab: references items by section id + item name (English).
@@ -55,14 +77,14 @@ window.MENU = {
         {
           title: ["Eggs and classics", "Yumurta ve klasikler"],
           items: [
-            i(["Plain Eggs", "Sahanda Yumurta"], "$10.90", "plain-eggs", ["Two eggs.", "İki yumurta."]),
+            v(i(["Plain Eggs", "Sahanda Yumurta"], "$10.90", "plain-eggs", ["Two eggs.", "İki yumurta."])),
             i(["Sucuk with Egg", "Sucuklu Yumurta"], "$13.90", "turkish-sujuk-w-egg", ["Two eggs, Turkish sucuk.", "İki yumurta, sucuk."]),
             i(["Ground Beef with Egg", "Kıymalı Yumurta"], "$14.90", "ground-beef-w-egg", ["Two eggs, seasoned ground beef.", "İki yumurta, baharatlı kıyma."]),
-            i(["Plain Omelet", "Sade Omlet"], "$10.90", "plain-omelet", ["Two eggs.", "İki yumurta."]),
-            i(["Cheese Omelet", "Peynirli Omlet"], "$11.90", "cheese-omelet", ["Two eggs, mozzarella.", "İki yumurta, mozzarella."]),
+            v(i(["Plain Omelet", "Sade Omlet"], "$10.90", "plain-omelet", ["Two eggs.", "İki yumurta."])),
+            v(i(["Cheese Omelet", "Peynirli Omlet"], "$11.90", "cheese-omelet", ["Two eggs, mozzarella.", "İki yumurta, mozzarella."])),
             i(["Sucuk Omelet", "Sucuklu Omlet"], "$13.90", "turkish-sujuk-omelet", ["Two eggs, Turkish sucuk.", "İki yumurta, sucuk."]),
-            i(["Veggie Omelet", "Sebzeli Omlet"], "$12.90", "veggie-omelet", ["Two eggs, onion, tomato, green pepper, mushroom.", "İki yumurta, soğan, domates, yeşil biber, mantar."]),
-            i(["Menemen", "Menemen"], "$14.90", "menemen", ["Scrambled eggs with tomatoes, green peppers and onions.", "Domates, yeşil biber ve soğanla pişmiş yumurta."]),
+            v(i(["Veggie Omelet", "Sebzeli Omlet"], "$12.90", "veggie-omelet", ["Two eggs, onion, tomato, green pepper, mushroom.", "İki yumurta, soğan, domates, yeşil biber, mantar."])),
+            v(i(["Menemen", "Menemen"], "$14.90", "menemen", ["Scrambled eggs with tomatoes, green peppers and onions.", "Domates, yeşil biber ve soğanla pişmiş yumurta."])),
           ],
         },
       ],
@@ -78,34 +100,34 @@ window.MENU = {
         {
           title: ["Soup and cold mezze", "Çorba ve soğuk mezeler"],
           items: [
-            i(["Mixed Appetizers", "Karışık Meze Tabağı"], "$19.90", "mixed-appetizers", ["Hummus, labneh, muhammara, cacık, falafel (2), sigara börek (2).", "Humus, labne, muhammara, cacık, falafel (2), sigara böreği (2)."]),
-            i(["Lentil Soup", "Mercimek Çorbası"], "$8.99", "lentil-soup", ["Red lentils, carrots, potatoes, onions and spices.", "Kırmızı mercimek, havuç, patates, soğan ve baharat."]),
-            i(["Hummus", "Humus"], "$8.50", "hummus", ["Chickpeas, tahini, garlic, olive oil and lemon.", "Nohut, tahin, sarımsak, zeytinyağı ve limon."],
-              ["Add beef +$6 · add chicken +$5", "Etli +$6 · tavuklu +$5"]),
-            i(["Labneh", "Labne"], "$8.50", "labneh", ["Strained yogurt with olive oil.", "Zeytinyağlı süzme yoğurt."]),
-            i(["Baba Ganoush", "Baba Ganuş"], "$8.50", "baba-ganoush", ["Smoky charred eggplant with tahini, garlic and lemon.", "Tahin, sarımsak ve limonlu közlenmiş patlıcan."]),
-            i(["Cacık (Tzatziki)", "Cacık"], "$8.50", "cacik-tzatziki", ["Strained yogurt, cucumber, olive oil, garlic and mint.", "Süzme yoğurt, salatalık, zeytinyağı, sarımsak ve nane."]),
-            i(["Ezme", "Ezme"], "$9.90", "ezme", ["Finely chopped tomatoes, cucumbers, onions, mild peppers, parsley and olive oil.", "İnce kıyılmış domates, salatalık, soğan, tatlı biber, maydanoz ve zeytinyağı."]),
-            i(["Falafel (6)", "Falafel (6)"], "$9.50", "falafel-6", ["Chickpeas, parsley, tomatoes, cilantro and spices.", "Nohut, maydanoz, domates, kişniş ve baharat."]),
+            v(i(["Mixed Appetizers", "Karışık Meze Tabağı"], "$19.90", "mixed-appetizers", ["Hummus, labneh, muhammara, cacık, falafel (2), sigara börek (2).", "Humus, labne, muhammara, cacık, falafel (2), sigara böreği (2)."])),
+            v(i(["Lentil Soup", "Mercimek Çorbası"], "$8.99", "lentil-soup", ["Red lentils, carrots, potatoes, onions and spices.", "Kırmızı mercimek, havuç, patates, soğan ve baharat."])),
+            v(i(["Hummus", "Humus"], "$8.50", "hummus", ["Chickpeas, tahini, garlic, olive oil and lemon.", "Nohut, tahin, sarımsak, zeytinyağı ve limon."],
+              ["Add beef +$6 · add chicken +$5", "Etli +$6 · tavuklu +$5"])),
+            v(i(["Labneh", "Labne"], "$8.50", "labneh", ["Strained yogurt with olive oil.", "Zeytinyağlı süzme yoğurt."])),
+            v(i(["Baba Ganoush", "Baba Ganuş"], "$8.50", "baba-ganoush", ["Smoky charred eggplant with tahini, garlic and lemon.", "Tahin, sarımsak ve limonlu közlenmiş patlıcan."])),
+            v(i(["Cacık (Tzatziki)", "Cacık"], "$8.50", "cacik-tzatziki", ["Strained yogurt, cucumber, olive oil, garlic and mint.", "Süzme yoğurt, salatalık, zeytinyağı, sarımsak ve nane."])),
+            v(i(["Ezme", "Ezme"], "$9.90", "ezme", ["Finely chopped tomatoes, cucumbers, onions, mild peppers, parsley and olive oil.", "İnce kıyılmış domates, salatalık, soğan, tatlı biber, maydanoz ve zeytinyağı."])),
+            v(i(["Falafel (6)", "Falafel (6)"], "$9.50", "falafel-6", ["Chickpeas, parsley, tomatoes, cilantro and spices.", "Nohut, maydanoz, domates, kişniş ve baharat."])),
           ],
         },
         {
           title: ["Hot starters", "Sıcak başlangıçlar"],
           items: [
             i(["Fun Basket", "Atıştırmalık Sepeti"], "$17.50", "fun-basket", ["Onion rings (3), sigara börek (2), beef sausage (2), chicken nuggets (3), fries.", "Soğan halkası (3), sigara böreği (2), dana sosis (2), tavuk nugget (3), patates kızartması."]),
-            i(["Sigara Börek (5)", "Sigara Böreği (5)"], "$8.99", "sigara-borek", ["Fried phyllo rolls with feta and parsley.", "Beyaz peynirli ve maydanozlu kızarmış yufka."]),
+            v(i(["Sigara Börek (5)", "Sigara Böreği (5)"], "$8.99", "sigara-borek", ["Fried phyllo rolls with feta and parsley.", "Beyaz peynirli ve maydanozlu kızarmış yufka."])),
             i(["Sucuk", "Sucuk"], "$11.90", "sucuk", ["Pan-fried Turkish sausage.", "Tavada sucuk."]),
             i(["Liver", "Ciğer Sote"], "$15.90", "liver", ["Pan-sautéed liver with onions, tomatoes and parsley.", "Soğan, domates ve maydanozla tavada ciğer."]),
             i(["Chicken Wings (6)", "Tavuk Kanat (6)"], "$14.90", "chicken-wings-6", ["Choose one: hot, mild, BBQ or plain.", "Seçiminiz: acılı, az acılı, barbekü veya sade."]),
-            i(["Fries", "Patates Kızartması"], "$7.90", "fries", ["Crispy golden french fries.", "Çıtır patates kızartması."]),
-            i(["Onion Rings", "Soğan Halkası"], "$8.50", "onion-rings", ["Battered and fried onion rings.", "Kaplamalı kızarmış soğan halkaları."]),
+            v(i(["Fries", "Patates Kızartması"], "$7.90", "fries", ["Crispy golden french fries.", "Çıtır patates kızartması."])),
+            v(i(["Onion Rings", "Soğan Halkası"], "$8.50", "onion-rings", ["Battered and fried onion rings.", "Kaplamalı kızarmış soğan halkaları."])),
           ],
         },
         {
           title: ["Gözleme", "Gözleme"],
           items: [
-            i(["Cheese Gözleme", "Peynirli Gözleme"], "$15.50", "cheese-gozleme", ["Thin layers of dough filled with mozzarella.", "Mozzarella dolgulu ince hamur."]),
-            i(["Potato Cheese Gözleme", "Patatesli Peynirli Gözleme"], "$15.50", "potato-cheese-gozleme", ["Filled with potato and cheese.", "Patates ve peynir dolgulu."]),
+            v(i(["Cheese Gözleme", "Peynirli Gözleme"], "$15.50", "cheese-gozleme", ["Thin layers of dough filled with mozzarella.", "Mozzarella dolgulu ince hamur."])),
+            v(i(["Potato Cheese Gözleme", "Patatesli Peynirli Gözleme"], "$15.50", "potato-cheese-gozleme", ["Filled with potato and cheese.", "Patates ve peynir dolgulu."])),
             i(["Ground Beef Gözleme", "Kıymalı Gözleme"], "$17.50", "ground-beef-gozleme", ["Filled with ground beef and mozzarella.", "Kıyma ve mozzarella dolgulu."]),
           ],
         },
@@ -120,11 +142,11 @@ window.MENU = {
       groups: [
         {
           items: [
-            i(["Gavurdağı Salad", "Gavurdağı Salatası"], "$9.99", "gavurdagi-salad", ["Cucumbers, tomatoes, parsley, onions, peppers, walnuts, pomegranate sauce and olive oil.", "Salatalık, domates, maydanoz, soğan, biber, ceviz, nar ekşisi ve zeytinyağı."]),
-            i(["Fattoush Salad", "Fattuş Salatası"], "$9.99", "fattoush-salad", ["Lettuce, tomatoes, cucumbers, mint, parsley, crispy pita, sumac, lemon and olive oil.", "Marul, domates, salatalık, nane, maydanoz, çıtır pide, sumak, limon ve zeytinyağı."]),
-            i(["Tabouleh", "Tabule"], "$9.99", "tabouleh", ["Parsley, cracked wheat, mint, tomatoes, lemon and olive oil.", "Maydanoz, bulgur, nane, domates, limon ve zeytinyağı."]),
-            i(["Shepherd's Salad", "Çoban Salata"], "$9.99", "shepperd-salad", ["Lettuce, cucumber, tomato, onion, green pepper.", "Marul, salatalık, domates, soğan, yeşil biber."]),
-            i(["Mediterranean Salad", "Akdeniz Salatası"], "$9.99", "mediterranean-salad", ["Lettuce, cucumber, tomato, onion, feta, black olives.", "Marul, salatalık, domates, soğan, beyaz peynir, siyah zeytin."]),
+            v(i(["Gavurdağı Salad", "Gavurdağı Salatası"], "$9.99", "gavurdagi-salad", ["Cucumbers, tomatoes, parsley, onions, peppers, walnuts, pomegranate sauce and olive oil.", "Salatalık, domates, maydanoz, soğan, biber, ceviz, nar ekşisi ve zeytinyağı."])),
+            v(i(["Fattoush Salad", "Fattuş Salatası"], "$9.99", "fattoush-salad", ["Lettuce, tomatoes, cucumbers, mint, parsley, crispy pita, sumac, lemon and olive oil.", "Marul, domates, salatalık, nane, maydanoz, çıtır pide, sumak, limon ve zeytinyağı."])),
+            v(i(["Tabouleh", "Tabule"], "$9.99", "tabouleh", ["Parsley, cracked wheat, mint, tomatoes, lemon and olive oil.", "Maydanoz, bulgur, nane, domates, limon ve zeytinyağı."])),
+            v(i(["Shepherd's Salad", "Çoban Salata"], "$9.99", "shepperd-salad", ["Lettuce, cucumber, tomato, onion, green pepper.", "Marul, salatalık, domates, soğan, yeşil biber."])),
+            v(i(["Mediterranean Salad", "Akdeniz Salatası"], "$9.99", "mediterranean-salad", ["Lettuce, cucumber, tomato, onion, feta, black olives.", "Marul, salatalık, domates, soğan, beyaz peynir, siyah zeytin."])),
           ],
         },
       ],
@@ -144,11 +166,11 @@ window.MENU = {
             i(["Steak and Cheese (Sub Roll)", "Etli Peynirli Sandviç"], "$16.99", "steak-cheese-sub-roll", ["Sliced steak, sautéed peppers and onions, cheese and mayonnaise.", "Dilim et, sote biber ve soğan, peynir ve mayonez."]),
             i(["Kumru", "Kumru"], "$17.99", "kumru", ["Pan-fried sausage and sucuk, cheese and mayonnaise.", "Tavada sosis ve sucuk, peynir ve mayonez."]),
             i(["Chicken Shawarma Wrap", "Tavuk Shawarma Dürüm"], "$15.99", "chicken-shawarma-wrap", ["Shawarma chicken, tomatoes, lettuce, pickles and garlic sauce.", "Shawarma tavuk, domates, marul, turşu ve sarımsaklı sos."]),
-            i(["Falafel Wrap", "Falafel Dürüm"], "$15.99", "falafel-wrap", ["Falafel, tomatoes, lettuce, pickles and mayonnaise.", "Falafel, domates, marul, turşu ve mayonez."]),
+            v(i(["Falafel Wrap", "Falafel Dürüm"], "$15.99", "falafel-wrap", ["Falafel, tomatoes, lettuce, pickles and mayonnaise.", "Falafel, domates, marul, turşu ve mayonez."])),
             i(["Köfte Sandwich", "Köfte Ekmek"], "$16.99", "kofte-sandwich", ["Grilled beef patties, tomatoes, lettuce, onions and mayonnaise.", "Izgara köfte, domates, marul, soğan ve mayonez."]),
             i(["Adana Wrap", "Adana Dürüm"], "$17.99", "adana-wrap", ["Ground beef and lamb with tomatoes, parsley, onions and sumac.", "Dana ve kuzu kıyma, domates, maydanoz, soğan ve sumak."]),
             i(["Chicken Sandwich", "Tavuk Sandviç"], "$15.99", "chicken-sandwich", ["Grilled marinated chicken, tomatoes, lettuce, onions and mayonnaise.", "Marine ızgara tavuk, domates, marul, soğan ve mayonez."]),
-            i(["Patso", "Patso"], "$12.50", "patso", ["Fries, ketchup and mayonnaise.", "Patates kızartması, ketçap ve mayonez."]),
+            v(i(["Patso", "Patso"], "$12.50", "patso", ["Fries, ketchup and mayonnaise.", "Patates kızartması, ketçap ve mayonez."])),
           ],
         },
         {
@@ -199,8 +221,8 @@ window.MENU = {
 
     {
       id: "pasta",
-      title: ["Pasta and Mantı", "Makarna ve Mantı"],
-      tabTitle: ["Pasta and Mantı", "Makarna"],
+      title: ["Pasta & Mantı", "Makarna & Mantı"],
+      tabTitle: ["Pasta & Mantı", "Makarna"],
       tag: ["Italian and Turkish", "İtalyan ve Türk"],
       layout: "grid",
       groups: [
@@ -208,7 +230,7 @@ window.MENU = {
           note: ["Add chicken +$7 · add köfte +$7 to any pasta", "Makarnalara tavuk +$7 · köfte +$7"],
           items: [
             i(["Chicken Alfredo", "Tavuklu Alfredo"], "$17.90", "chicken-alfredo", ["Fettuccine with grilled chicken and Alfredo sauce.", "Izgara tavuklu ve Alfredo soslu fettuccine."]),
-            i(["Penne Arrabbiata", "Penne Arrabbiata"], "$15.90", "penne-arrabbiata", ["Penne with tomatoes, peppers, garlic, spices and parsley.", "Domates, biber, sarımsak, baharat ve maydanozlu penne."]),
+            v(i(["Penne Arrabbiata", "Penne Arrabbiata"], "$15.90", "penne-arrabbiata", ["Penne with tomatoes, peppers, garlic, spices and parsley.", "Domates, biber, sarımsak, baharat ve maydanozlu penne."])),
             i(["Mantı", "Mantı"], "$18.90", "manti", ["Turkish dumplings filled with seasoned ground beef, topped with garlic yogurt and spiced butter.", "Baharatlı kıyma dolgulu mantı, sarımsaklı yoğurt ve tereyağlı sos ile."]),
           ],
         },
@@ -223,7 +245,7 @@ window.MENU = {
       groups: [
         {
           items: [
-            i(["Rice", "Pilav"], "$5.00"),
+            v(i(["Rice", "Pilav"], "$5.00")),
             i(["Plain Yogurt", "Yoğurt"], "$5.00"),
             i(["Pickles", "Turşu"], "$5.00"),
             i(["Extra Bread", "Ekstra Ekmek"], "$1.50"),
@@ -247,13 +269,13 @@ window.MENU = {
             i(["Ground Beef and Cheese Pide", "Kıymalı Kaşarlı Pide"], "$19.90", "ground-beef-and-cheese-pide", ["Turkish flatbread with seasoned ground beef and melted cheese.", "Baharatlı kıyma ve eritilmiş peynirli pide."]),
             i(["Diced Beef and Cheese Pide", "Kuşbaşılı Kaşarlı Pide"], "$20.90", "diced-beef-and-cheese-pide", ["Turkish flatbread with diced beef and melted cheese.", "Kuşbaşı et ve eritilmiş peynirli pide."]),
             i(["Sucuk and Cheese Pide", "Sucuklu Kaşarlı Pide"], "$18.90", "sucuk-and-cheese-pide", ["Turkish flatbread with sliced sucuk and melted cheese.", "Dilim sucuk ve eritilmiş peynirli pide."]),
-            i(["Cheese Pide", "Kaşarlı Pide"], "$15.90", "cheese-pide", ["Turkish flatbread with melted cheese.", "Eritilmiş peynirli pide."]),
+            v(i(["Cheese Pide", "Kaşarlı Pide"], "$15.90", "cheese-pide", ["Turkish flatbread with melted cheese.", "Eritilmiş peynirli pide."])),
           ],
         },
         {
           title: ["Pizza", "Pizza"],
           items: [
-            i(["Cheese Pizza", "Peynirli Pizza"], "$17.90", "cheese-pizza", ["Pizza sauce and cheese.", "Pizza sosu ve peynir."]),
+            v(i(["Cheese Pizza", "Peynirli Pizza"], "$17.90", "cheese-pizza", ["Pizza sauce and cheese.", "Pizza sosu ve peynir."])),
             i(["Huqqa Mixed Pizza", "Huqqa Karışık Pizza"], "$22.90", "huqqa-mixed-pizza", ["Sucuk, sausage, green peppers, mushrooms, tomatoes, corn, olives and cheese.", "Sucuk, sosis, yeşil biber, mantar, domates, mısır, zeytin ve peynir."]),
             i(["Steak and Cheese Pizza", "Etli Peynirli Pizza"], "$23.90", "steak-and-cheese-pizza", ["Pizza sauce, sliced steak, green peppers, onions, mushrooms and cheese.", "Pizza sosu, dilim et, yeşil biber, soğan, mantar ve peynir."]),
           ],
@@ -387,6 +409,8 @@ window.MENU = {
       title: ["Hookah", "Nargile"],
       tag: ["Premium blends", "Premium karışımlar"],
       layout: "hookah",
+      // {21} is drawn as the gold "21+" badge.
+      age: ["Hookah is served to {21} guests only. We may ask to see ID before serving.", "Nargile yalnızca {21} misafirlere servis edilir. Servisten önce kimlik sorabiliriz."],
       // Brand buttons next to the title; tapping one greys out the other brands' flavors.
       brandFilter: ["Al Fakher", "Adalya", "Starbuzz"],
       // Hookah tiers (not refills) are discounted from opening until 4 PM, Virginia time;
@@ -440,10 +464,12 @@ window.MENU = {
     },
   ],
 
+  // Shown under the halal line, larger and brighter than the other notices.
+  allergy: ["Our food may contain milk, eggs, wheat, soybean, tree nuts, peanuts, sesame or fish. Please tell your server about any allergies.",
+    "Yemeklerimiz süt, yumurta, buğday, soya, sert kabuklu yemiş, yer fıstığı, susam veya balık içerebilir. Alerjiniz varsa lütfen garsonunuza bildirin."],
+
   notices: [
     ["Our food menu is 100% halal.", "Yemek menümüz %100 helaldir."],
-    ["Our food may contain milk, eggs, wheat, soybean, tree nuts, peanuts, sesame or fish. Please tell your server about any allergies.",
-     "Yemeklerimiz süt, yumurta, buğday, soya, sert kabuklu yemiş, yer fıstığı, susam veya balık içerebilir. Alerjiniz varsa lütfen garsonunuza bildirin."],
     ["Consuming raw or undercooked meats, poultry, seafood or eggs may increase your risk of food-borne illness.",
      "Çiğ veya az pişmiş et, tavuk, deniz ürünü ya da yumurta tüketmek gıda kaynaklı hastalık riskini artırabilir."],
     ["18% gratuity may be added for parties of 3 or more. $25 minimum spend per person.",
