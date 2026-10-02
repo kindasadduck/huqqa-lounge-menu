@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0a08">
+  <title>Huqqa Lounge Menu</title>
+  <meta name="description" content="Huqqa Lounge menu: Turkish breakfast, grill, pide, desserts, drinks and hookah. Falls Church, VA.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="top" id="top">
+    <div class="top-row">
+      <a class="brand" href="#" data-scroll-top>
+        <span class="brand-name">Huqqa Lounge</span>
+        <span class="brand-sub" data-i18n="brandSub"></span>
+      </a>
+      <div class="top-actions">
+        <div class="lang" role="group" aria-label="Language">
+          <button type="button" data-lang="en">EN</button>
+          <button type="button" data-lang="tr">TR</button>
+        </div>
+        <button type="button" class="icon-btn" id="searchToggle" aria-expanded="false" data-i18n-label="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="search" id="searchRow" hidden>
+      <input id="searchInput" type="search" autocomplete="off" data-i18n-placeholder="searchPlaceholder">
+      <button type="button" class="search-clear" id="searchClear" data-i18n-label="close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="tabs-wrap">
+      <nav class="tabs" id="tabs" aria-label="Menu sections"></nav>
+      <span class="tabs-divider" aria-hidden="true"></span>
+      <a class="tab pinned" id="pinnedTab" href="#hookah" data-target="hookah"></a>
+    </div>
+  </header>
+
+  <main id="menu"></main>
+  <footer class="foot" id="foot"></footer>
+
+  <button type="button" class="to-top" id="toTop" data-i18n-label="backToTop">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+  </button>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <figure>
+      <img alt="">
+      <figcaption><span class="lb-name"></span><span class="lb-price"></span></figcaption>
+    </figure>
+  </div>
+
+  <script src="assets/js/menu-data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

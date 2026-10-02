@@ -1,0 +1,6 @@
+# Source photos (large originals) and local tooling stay off the published site.
+source/
+graphify-out/
+.claude/
+.DS_Store
+__pycache__/
