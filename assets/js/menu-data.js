@@ -349,8 +349,10 @@ window.MENU = {
               temps: true, flavors: SYRUPS,
               v: variants(["Vanilla", "Caramel", "Hazelnut", "Nutella"], "latte-", "iced-latte-") }),
             d(["Macchiato", "Macchiato"], "$8.50", "caramel-macchiato", {
-              temps: true, flavors: [["Caramel", "Karamel"]],
-              v: { "Caramel": "caramel-macchiato", "Iced Caramel": "iced-caramel-macchiato" } }),
+              // No plain macchiato photo yet: Plain shows the caramel one.
+              temps: true, flavors: [["Plain", "Sade"], ["Caramel", "Karamel"]],
+              v: { "Plain": "caramel-macchiato", "Iced Plain": "iced-caramel-macchiato",
+                "Caramel": "caramel-macchiato", "Iced Caramel": "iced-caramel-macchiato" } }),
             d(["Mocha", "Mocha"], "$8.50", "mocha", { temps: true, v: { "": "mocha", "Iced": "iced-mocha" } }),
             d(["Cappuccino", "Cappuccino"], "$7.90", "cappuccino"),
             d(["Espresso", "Espresso"], "$4.90 / $5.90", "espresso-single", {
