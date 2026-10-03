@@ -338,6 +338,23 @@ img { pointer-events: none; -webkit-touch-callout: none; -webkit-user-select: no
 .brand-btn[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: #1c1609; }
 .row.plain { grid-template-columns: minmax(0, 1fr) auto; }
 
+/* Staff picks rail (hookah) */
+.srail { align-items: stretch; margin-bottom: 4px; }
+.scard {
+  flex: 0 0 74%; display: flex; flex-direction: column; padding: 13px 14px; border-radius: 16px;
+  background: var(--card); border: 1px solid var(--gold-line);
+}
+.scard-head { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600; }
+.scard-av {
+  width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center;
+  background: var(--gold); color: #1c1609; font: 700 15px/1 var(--serif);
+}
+.scard-mix { margin-top: 11px; font: 700 19px/1.25 var(--serif); }
+.scard-plus { color: var(--gold); }
+.scard-also { margin-top: 6px; font-size: 12.5px; color: var(--muted); }
+.scard-tier { margin-top: auto; padding-top: 10px; font-size: 13px; font-weight: 600; color: var(--gold); }
+.scard-tier .price { font-size: 13px; }
+
 /* Happy hour: body.hh is set while the discount is live. */
 body:not(.hh) .hh-on, body.hh .hh-off { display: none; }
 .price s { color: var(--faint); font-weight: 500; font-size: 13px; margin-right: 6px; }

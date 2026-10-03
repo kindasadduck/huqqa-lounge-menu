@@ -26,6 +26,10 @@
     tapPreview: ["Tap an option to see it.", "Görmek için bir seçeneğe dokunun."],
     vegetarian: ["Vegetarian", "Vejetaryen"],
     hours: ["Hours", "Çalışma saatleri"],
+    staffPicks: ["Staff picks", "Ekibimizin favorileri"],
+    alsoLoves: ["Also loves", "Ayrıca sever:"],
+    classic: ["Classic", "Klasik"],
+    premium: ["Premium", "Premium"],
     rateUs: ["Rate us on Google", "Google'da değerlendirin"],
     wifi: ["Wi-Fi", "Wi-Fi"],
     network: ["Network", "Ağ"],
@@ -195,6 +199,23 @@
       <span class="hh-test-track"><span></span></span>Happy hour test
     </button>`;
 
+  // Staff picks: one card per server. A bowl with any premium flavor is priced as premium.
+  const staffCard = (s, p) => {
+    const [main, ...more] = p.picks;
+    const tier = main.some((f) => !s.tiers[0].flavors.includes(f)) ? 1 : 0;
+    const t = s.tiers[tier];
+    const words = [p.name, ...p.picks.flat()];
+    return `<div class="scard" data-search="${esc(fold(words.join(" ")))}">
+      <div class="scard-head"><span class="scard-av" aria-hidden="true">${esc(p.name[0])}</span>${esc(L(p.title))}</div>
+      <div class="scard-mix">${main.map(esc).join(' <span class="scard-plus">+</span> ')}</div>
+      ${more.length ? `<div class="scard-also">${esc(L(UI.alsoLoves))} ${more.map((m) => esc(m.join(" + "))).join(", ")}</div>` : ""}
+      <div class="scard-tier">${esc(L(tier ? UI.premium : UI.classic))} · ${tierPrice(t.price, s.happyHour && t.hhDiscount)}</div>
+    </div>`;
+  };
+  const staffPicks = (s) => (s.staffPicks
+    ? `<h3 class="sub">${esc(L(UI.staffPicks))}</h3>${rail(s.staffPicks.map((p) => staffCard(s, p)), "srail")}`
+    : "");
+
   const hookah = (s) => {
     const tiers = s.tiers.map((t) => `
       <div class="tier" data-search="${esc(fold(t.title.join(" ")))}" data-brands="${esc([t.brand, ...Object.keys(t.brandOf || {})].filter(Boolean).join("|"))}">
@@ -202,7 +223,7 @@
         <div class="flavors">${t.flavors.map((f) => `<span class="flavor" data-search="${esc(fold(f))}" data-brands="${esc(brandOf(t, f))}">${esc(f)}</span>`).join("")}</div>
       </div>`).join("");
     const age = s.age ? `<p class="age">${esc(L(s.age)).replace("{21}", '<span class="age-badge">21+</span>')}</p>` : "";
-    return hhTestSwitch() + happyHour(s.happyHour) + tiers + s.groups.map((g) => group(g, plainRow)).join("") + age;
+    return hhTestSwitch() + happyHour(s.happyHour) + tiers + staffPicks(s) + s.groups.map((g) => group(g, plainRow)).join("") + age;
   };
 
   // ---- drinks -------------------------------------------------------------
@@ -546,7 +567,7 @@
     rails.forEach((r) => r.observer.disconnect());
     rails = $$(".rail").map((el) => {
       const r = { el, pos: 0, pausedUntil: 0, touching: false, visible: true, idleTimer: 0,
-        speed: el.classList.contains("drail") ? DRINK_SPEED : SPEED };
+        speed: el.matches(".drail, .srail") ? DRINK_SPEED : SPEED };
       const setWidth = () => {
         const n = +el.dataset.count;
         return el.children[n].offsetLeft - el.children[0].offsetLeft;

@@ -417,7 +417,7 @@ window.MENU = {
       // {21} is drawn as the gold "21+" badge.
       age: ["Hookah is served to {21} guests only. We may ask to see ID before serving.", "Nargile yalnızca {21} misafirlere servis edilir. Servisten önce kimlik sorabiliriz."],
       // Brand buttons next to the title; tapping one greys out the other brands' flavors.
-      brandFilter: ["Al Fakher", "Adalya", "Starbuzz"],
+      brandFilter: ["Al Fakher", "Starbuzz", "Adalya", "Serbetli", "Afzal"],
       // Hookah tiers (not refills) are discounted from opening until 4 PM, Virginia time;
       // each tier sets its own hhDiscount.
       // Opening hour by weekday (0 = Sunday): 11 AM, except Saturday and Sunday at 9 AM.
@@ -439,30 +439,43 @@ window.MENU = {
           brand: "Al Fakher",
           flavors: ["Double Apple", "Double Apple Mint", "Mint", "Orange", "Orange Mint", "Gum Mint", "Grape", "Grape Mint",
             "Grapefruit Mint", "Lemon Mint", "Citrus Mint", "Watermelon", "Watermelon Mint", "Gum and Cinnamon",
-            "Blueberry Mint", "Peach", "Peach Mint", "Cappuccino", "Berry Mix", "Rose"],
+            "Blueberry Mint", "Peach", "Peach Mint", "Cappuccino", "Berry Mix", "Rose", "Mango", "Pineapple", "Cherry Mint",
+            "Kiwi", "Guava", "Melon", "Vanilla", "Wild Berry Mint", "Marbella", "Mint Cream", "Chewing Gum"],
         },
         {
+          // Every brand except Al Fakher is premium. Flavors are listed brand by brand.
           title: ["Premium Flavors", "Premium Aromalar"],
           price: "$26.90",
           hhDiscount: 7,
-          flavors: ["Blue Mist", "Blue Mist Mint", "Pink", "Tropicool", "Tropicool Mint", "Code 69", "Exotic Strawberry Daiquiri",
-            "Citrus Mist", "Melon Blue", "Safari Melon Dew", "Irish Peach", "Sex on the Beach", "White Peach", "Skyfall",
-            "Love 66", "Lady Killer", "Baku Nights", "Berlin Nights", "Mi Amor", "Pan"],
-          // Brand per flavor (Claude's assignment; Tropicool and Pan unverified).
+          flavors: ["Blue Mist", "Blue Mist Mint", "Pink", "Tropicool", "Tropicool Mint", "Code 69", "Melon Blue",
+            "Safari Melon Dew", "Irish Peach", "Sex on the Beach", "White Peach", "Queen of Sex",
+            "Skyfall", "Love 66", "Lady Killer", "Baku Nights", "Berlin Nights", "Mi Amor",
+            "Ice Lemon Mint", "Ice Orange", "Ice Blueberry", "Istanbul Nights", "Lime Spice Peach", "Toasted Berry",
+            "Pan"],
           brandOf: {
-            Starbuzz: ["Blue Mist", "Blue Mist Mint", "Pink", "Code 69", "Exotic Strawberry Daiquiri", "Citrus Mist",
-              "Melon Blue", "Safari Melon Dew", "Irish Peach", "Sex on the Beach", "White Peach"],
-            Adalya: ["Tropicool", "Tropicool Mint", "Skyfall", "Love 66", "Lady Killer", "Baku Nights", "Berlin Nights",
-              "Mi Amor", "Pan"],
+            Starbuzz: ["Blue Mist", "Blue Mist Mint", "Pink", "Tropicool", "Tropicool Mint", "Code 69", "Melon Blue",
+              "Safari Melon Dew", "Irish Peach", "Sex on the Beach", "White Peach", "Queen of Sex"],
+            Adalya: ["Skyfall", "Love 66", "Lady Killer", "Baku Nights", "Berlin Nights", "Mi Amor"],
+            Serbetli: ["Ice Lemon Mint", "Ice Orange", "Ice Blueberry", "Istanbul Nights", "Lime Spice Peach", "Toasted Berry"],
+            Afzal: ["Pan"],
           },
         },
+      ],
+      // Servers' favorite bowls, shown as a sliding rail under the flavor lists. Each pick is one bowl
+      // (a mix when it has several flavors); the first is the headline, the rest show as "Also loves".
+      staffPicks: [
+        { name: "Wafaa", title: ["Wafaa's pick", "Wafaa'nın seçimi"], picks: [["Ice Lemon Mint", "Mango"], ["Marbella"]] },
+        { name: "Esma", title: ["Esma's pick", "Esma'nın seçimi"], picks: [["Lime Spice Peach", "Mi Amor"]] },
+        { name: "Can", title: ["Can's pick", "Can'ın seçimi"], picks: [["Istanbul Nights"]] },
+        { name: "Eylül", title: ["Eylül's pick", "Eylül'ün seçimi"], picks: [["Ice Lemon Mint", "Mango"]] },
+        { name: "Deniz", title: ["Deniz's pick", "Deniz'in seçimi"], picks: [["Baku Nights", "Skyfall"]] },
       ],
       groups: [
         {
           title: ["Refills", "Kafa değişimi"],
           items: [
             { ...i(["Classic Refill", "Klasik Kafa"], "$12.90", null), brands: ["Al Fakher"] },
-            { ...i(["Premium Refill", "Premium Kafa"], "$13.90", null), brands: ["Starbuzz", "Adalya"] },
+            { ...i(["Premium Refill", "Premium Kafa"], "$13.90", null), brands: ["Starbuzz", "Adalya", "Serbetli", "Afzal"] },
           ],
         },
       ],
