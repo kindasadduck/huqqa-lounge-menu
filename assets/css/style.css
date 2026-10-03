@@ -54,11 +54,6 @@ img { pointer-events: none; -webkit-touch-callout: none; -webkit-user-select: no
 .lang button { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; padding: 6px 9px; border-radius: 9px; color: var(--muted); }
 @media (max-width: 340px) { .lang button { padding: 6px 6px; } .top-actions { gap: 6px; } }
 .lang button[aria-pressed="true"] { background: var(--card-2); color: var(--gold); }
-/* TEST ONLY (remove later): kitchen strip test buttons, on their own line under the language toggle */
-.top-actions { flex-wrap: wrap; justify-content: flex-end; max-width: 130px; }
-.kt { order: 3; display: flex; gap: 4px; padding: 2px; border: 1px dashed var(--faint); border-radius: 10px; }
-.kt button { padding: 3px 7px; border-radius: 7px; font-size: 10.5px; font-weight: 600; color: var(--muted); }
-.kt button[aria-pressed="true"] { background: var(--gold); color: #1c1609; }
 .icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--text); }
 .icon-btn[aria-expanded="true"] { border-color: var(--gold-line); color: var(--gold); }
 
@@ -381,12 +376,6 @@ body:not(.hh) .hh-on, body.hh .hh-off { display: none; }
 @keyframes hh-pulse { 0% { box-shadow: 0 0 0 0 rgba(122, 30, 18, 0.6); } 100% { box-shadow: 0 0 0 9px rgba(122, 30, 18, 0); } }
 @keyframes hh-pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(215, 177, 106, 0.7); } 100% { box-shadow: 0 0 0 7px rgba(215, 177, 106, 0); } }
 @keyframes hh-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(215, 177, 106, 0); } 50% { box-shadow: 0 0 22px 0 rgba(215, 177, 106, 0.35); } }
-/* TEST ONLY (remove later): happy hour switch */
-.hh-test { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 12px; padding: 6px 10px 6px 6px; border-radius: 999px; border: 1px dashed var(--faint); font-size: 12px; font-weight: 600; color: var(--muted); }
-.hh-test-track { position: relative; width: 32px; height: 18px; border-radius: 999px; background: var(--card-2); border: 1px solid var(--line); transition: background 0.2s; }
-.hh-test-track span { position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--muted); transition: transform 0.2s, background 0.2s; }
-.hh-test[aria-checked="true"] .hh-test-track { background: var(--gold-soft); border-color: var(--gold-line); }
-.hh-test[aria-checked="true"] .hh-test-track span { transform: translateX(14px); background: var(--gold); }
 .tab.pinned[aria-current="true"] .hh-badge { background: #1c1609; color: var(--gold); }
 
 /* Vegetarian mark and hookah age line */

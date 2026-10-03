@@ -192,13 +192,6 @@
     $$("[data-brands]").forEach((el) => el.classList.toggle("off", !!brand && !el.dataset.brands.split("|").includes(brand)));
   }
 
-  // TEST ONLY (remove later): switch that forces happy hour on/off, overriding the clock.
-  let hhTest = null;
-  const hhTestSwitch = () => `
-    <button type="button" class="hh-test" id="hhTest" role="switch" aria-checked="false">
-      <span class="hh-test-track"><span></span></span>Happy hour test
-    </button>`;
-
   // Staff picks: one card per server. A bowl with any premium flavor is priced as premium.
   const staffCard = (s, p) => {
     const [main, ...more] = p.picks;
@@ -223,7 +216,7 @@
         <div class="flavors">${t.flavors.map((f) => `<span class="flavor" data-search="${esc(fold(f))}" data-brands="${esc(brandOf(t, f))}">${esc(f)}</span>`).join("")}</div>
       </div>`).join("");
     const age = s.age ? `<p class="age">${esc(L(s.age)).replace("{21}", '<span class="age-badge">21+</span>')}</p>` : "";
-    return hhTestSwitch() + happyHour(s.happyHour) + tiers + staffPicks(s) + s.groups.map((g) => group(g, plainRow)).join("") + age;
+    return happyHour(s.happyHour) + tiers + staffPicks(s) + s.groups.map((g) => group(g, plainRow)).join("") + age;
   };
 
   // ---- drinks -------------------------------------------------------------
@@ -460,9 +453,7 @@
     const inHours = hour >= hh.opens[day] && hour < hh.until;
     // ?hh=1 / ?hh=0 forces the state, for showing the happy hour look at any time of day.
     const forced = new URLSearchParams(location.search).get("hh");
-    const live = hhTest !== null ? hhTest : forced === null ? inHours : forced === "1";
-    const sw = $("#hhTest"); // TEST ONLY
-    if (sw) sw.setAttribute("aria-checked", String(live));
+    const live = forced === null ? inHours : forced === "1";
     document.body.classList.toggle("hh", live);
     const ends = $("#hhEnds");
     if (live && ends && !inHours) ends.textContent = L(hh.endsAt);
@@ -476,7 +467,6 @@
   // ---- kitchen closing (Virginia time) ------------------------------------
   // In the last 30 minutes before the kitchen closes a strip at the top counts down; after that,
   // until the lounge closes, it says the kitchen is closed. ?kitchen=soon / ?kitchen=closed forces it.
-  let kitchenTest = null; // TEST ONLY (remove later): set by the Soon / Closed buttons in the header
   function updateKitchen() {
     const k = M.info.kitchen, el = $("#kitchen");
     if (!k || !el) return;
@@ -487,8 +477,7 @@
     let mins = +parts.hour * 60 + +parts.minute;
     if (+parts.hour < 6) { day = (day + 6) % 7; mins += 24 * 60; } // after midnight still belongs to the evening before
     const close = k.closes[day] * 60, kitchen = close - 60;
-    const forced = kitchenTest || new URLSearchParams(location.search).get("kitchen");
-    $$("[data-kt]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.kt === kitchenTest))); // TEST ONLY
+    const forced = new URLSearchParams(location.search).get("kitchen");
     if (forced === "soon") mins = kitchen - 25;
     if (forced === "closed") mins = kitchen + 5;
     const at = (m) => {
@@ -842,16 +831,6 @@
     }
     const copyBtn = e.target.closest(".copy-btn");
     if (copyBtn) { copyText(copyBtn); return; }
-
-    const kt = e.target.closest("[data-kt]"); // TEST ONLY
-    if (kt) {
-      kitchenTest = kitchenTest === kt.dataset.kt ? null : kt.dataset.kt;
-      updateKitchen();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
-    if (e.target.closest("#hhTest")) { hhTest = !document.body.classList.contains("hh"); updateHappyHour(); return; } // TEST ONLY
 
     const brandBtn = e.target.closest(".brand-btn");
     if (brandBtn) { brand = brand === brandBtn.dataset.brand ? null : brandBtn.dataset.brand; applyBrand(); return; }
