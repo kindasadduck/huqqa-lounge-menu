@@ -201,6 +201,7 @@
     return `<div class="scard" data-search="${esc(fold(words.join(" ")))}">
       <div class="scard-head"><span class="scard-av" aria-hidden="true">${esc(p.name[0])}</span>${esc(L(p.title))}</div>
       <div class="scard-mix">${main.map(esc).join(' <span class="scard-plus">+</span> ')}</div>
+      ${p.note ? `<div class="scard-also">${esc(L(p.note))}</div>` : ""}
       ${more.length ? `<div class="scard-also">${esc(L(UI.alsoLoves))} ${more.map((m) => esc(m.join(" + "))).join(", ")}</div>` : ""}
       <div class="scard-tier">${esc(L(tier ? UI.premium : UI.classic))} · ${tierPrice(t.price, s.happyHour && t.hhDiscount)}</div>
     </div>`;

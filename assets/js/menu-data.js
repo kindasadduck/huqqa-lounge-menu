@@ -463,11 +463,13 @@ window.MENU = {
       ],
       // Servers' favorite bowls, shown as a sliding rail under the flavor lists. Each pick is one bowl
       // (a mix when it has several flavors); the first is the headline, the rest show as "Also loves".
+      // An optional note shows under the mix.
       staffPicks: [
         { name: "Wafaa", title: ["Wafaa's pick", "Wafaa'nın seçimi"], picks: [["Ice Lemon Mint", "Mango"], ["Marbella"]] },
         { name: "Esma", title: ["Esma's pick", "Esma'nın seçimi"], picks: [["Lime Spice Peach", "Mi Amor"]] },
         { name: "Can", title: ["Can's pick", "Can'ın seçimi"], picks: [["Istanbul Nights"]] },
-        { name: "Eylül", title: ["Eylül's pick", "Eylül'ün seçimi"], picks: [["Ice Lemon Mint", "Mango"]] },
+        { name: "Eylül", title: ["Eylül's pick", "Eylül'ün seçimi"], picks: [["Baku Nights", "Safari Melon Dew"]],
+          note: ["Our first mix to become a hit. Everyone fell for it.", "Dükkânın ilk patlayan karışımı; herkes çok sevdi."] },
         { name: "Deniz", title: ["Deniz's pick", "Deniz'in seçimi"], picks: [["Baku Nights", "Skyfall"]] },
       ],
       groups: [
