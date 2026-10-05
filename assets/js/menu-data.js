@@ -325,16 +325,16 @@ window.MENU = {
         kicker: ["House signature", "Evin klasiği"],
         title: ["Turkish Tea", "Türk Çayı"],
         tiles: [
-          { name: ["Tea Pot", "Demlik"], search: ["Turkish Tea Pot", "Demlik Çay"], price: "$19.99", img: "turkish-tea-pot",
+          { name: ["Tea Pot", "Demlik"], search: ["Turkish Tea Pot", "Demlik Çay"], price: "$18.99", img: "turkish-tea-pot",
             plus: ["Flavored +$1", "Aromalı +$1"],
-            more: d(["Flavored Tea Pot", "Aromalı Demlik Çay"], "$20.99", null,
+            more: d(["Flavored Tea Pot", "Aromalı Demlik Çay"], "$19.99", null,
               { note: ["The Tea Pot with a flavored tea instead, $1 extra.", "Demlik, aromalı çay ile; $1 fark."], flavors: TEAS }) },
           { name: ["Small Pot", "Küçük Demlik"], search: ["Small Turkish Tea Pot", "Küçük Demlik Çay"], price: "$14.99", img: "small-turkish-tea-pot" },
           { name: ["Glass", "Bardak"], search: ["Turkish Tea Glass", "Bardak Çay"], price: "$2.99", img: "turkish-tea-glass" },
           // Full-width strip under the three tea tiles.
           { name: ["Flavored Tea", "Bitki Çayı"], sub: ["Mug", "Kupa"], price: "$4.90", img: "flavored-tea", wide: true,
             more: d(["Flavored Tea", "Bitki Çayı"], "$4.90", null,
-              { note: ["By the mug. A pot of flavored tea is $20.99.", "Kupa. Aromalı demlik $20.99."], flavors: TEAS }) },
+              { note: ["By the mug. A pot of flavored tea is $19.99.", "Kupa. Aromalı demlik $19.99."], flavors: TEAS }) },
         ],
       },
       groups: [
