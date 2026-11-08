@@ -69,21 +69,41 @@ img { pointer-events: none; -webkit-touch-callout: none; -webkit-user-select: no
 .search input::placeholder { color: var(--faint); }
 .search-clear { position: absolute; right: calc(var(--gutter) + 6px); top: 6px; width: 36px; height: 36px; display: grid; place-items: center; color: var(--gold); }
 
-.tabs-wrap { position: relative; display: flex; align-items: flex-start; max-width: 560px; margin-inline: auto; }
-.tabs {
-  flex: 1; min-width: 0;
-  display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
-  padding: 2px 28px 12px var(--gutter);
-  scroll-padding-inline: var(--gutter);
+.tabs-wrap { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; max-width: 560px; margin-inline: auto; padding: 0 var(--gutter) 10px; }
+.tab.pinned { margin: 0; }
+.burger {
+  width: 44px; height: 44px; flex-shrink: 0; display: grid; place-content: center; gap: 5px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--card); transition: border-color 0.25s;
 }
-/* Hookah stays pinned on the right behind a divider; the fade hides tabs sliding under it. */
-.tabs-divider { position: relative; flex-shrink: 0; width: 1px; height: 26px; margin: 7px 10px 0 0; background: #4a4337; }
-.tabs-divider::before {
-  content: ""; position: absolute; right: 100%; top: -9px; bottom: -14px; width: 48px; pointer-events: none;
-  background: linear-gradient(90deg, rgba(11, 10, 8, 0), rgba(11, 10, 8, 0.85) 55%, rgb(11, 10, 8));
+.burger span { display: block; width: 20px; height: 2px; border-radius: 1px; background: var(--text); transition: transform 0.25s, opacity 0.25s, background 0.25s; }
+.burger:hover span { background: var(--gold); }
+.burger[aria-expanded="true"] { border-color: var(--gold-line); }
+.burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.tab.pinned { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; padding: 0 18px; }
+/* Sections menu: drops down under the header */
+.sec-menu {
+  position: absolute; left: 0; right: 0; top: 100%; z-index: 21; display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  max-width: 560px; margin-inline: auto; padding: 10px var(--gutter) 14px; background: var(--card); border: 1px solid var(--gold-line); border-top: 0;
+  border-radius: 0 0 22px 22px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  visibility: hidden; opacity: 0; transform: translateY(-14px);
+  transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.55s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s linear 0.55s;
+  max-height: calc(100dvh - var(--header-h) - 12px); overflow-y: auto;
 }
-.tab.pinned { margin: 2px var(--gutter) 0 0; }
-.tabs::-webkit-scrollbar { display: none; }
+body.sec-open .sec-menu { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
+.mlink {
+  display: flex; align-items: center; justify-content: space-between; gap: 6px; min-height: 48px; padding: 0 14px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--card-2); font: 600 16px/1.15 var(--serif); color: var(--text);
+  transition: border-color 0.25s, background 0.25s;
+}
+.mlink.wide { grid-column: 1 / -1; }
+.mlink:hover { border-color: var(--gold-line); background: #211d17; }
+.mlink svg { width: 18px; height: 18px; fill: none; stroke: var(--gold); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity 0.25s; }
+.mlink[aria-current="true"] { border-color: var(--gold); background: var(--gold-soft); color: var(--gold); }
+.mlink[aria-current="true"] svg { opacity: 1; }
+.sec-scrim { position: fixed; inset: 0; z-index: 19; background: rgba(5, 4, 3, 0.66); opacity: 0; transition: opacity 0.55s cubic-bezier(0.22, 0.61, 0.36, 1); pointer-events: none; }
+body.sec-open .sec-scrim { opacity: 1; pointer-events: auto; }
 .tab {
   flex-shrink: 0; padding: 8px 15px; border-radius: 999px;
   background: var(--card); border: 1px solid var(--line);
@@ -333,21 +353,45 @@ img { pointer-events: none; -webkit-touch-callout: none; -webkit-user-select: no
 .brand-btn[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: #1c1609; }
 .row.plain { grid-template-columns: minmax(0, 1fr) auto; }
 
-/* Staff picks rail (hookah) */
-.srail { align-items: stretch; margin-bottom: 4px; }
+/* Staff picks deck (hookah): one big card per server, snaps into place */
+.deck-track {
+  display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain;
+  margin: 0 calc(-1 * var(--gutter)); padding: 4px var(--gutter) 10px; scroll-padding-inline: var(--gutter);
+}
+.deck-track::-webkit-scrollbar { display: none; }
 .scard {
-  flex: 0 0 74%; display: flex; flex-direction: column; padding: 13px 14px; border-radius: 16px;
-  background: var(--card); border: 1px solid var(--gold-line);
+  flex: 0 0 82%; scroll-snap-align: start; display: flex; flex-direction: column; min-height: 290px; padding: 18px; border-radius: 20px;
+  border: 1px solid var(--gold-line);
+  background: radial-gradient(120% 70% at 0% 0%, rgba(215, 177, 106, 0.18), transparent 62%), var(--card);
+  opacity: 0.78; transform: scale(0.965); transition: opacity 0.55s cubic-bezier(0.22, 0.61, 0.36, 1), transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
-.scard-head { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600; }
+.scard.is-on { opacity: 1; transform: none; }
+.scard-head { display: flex; align-items: center; gap: 11px; font-size: 14.5px; font-weight: 600; }
 .scard-av {
-  width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center;
-  background: var(--gold); color: #1c1609; font: 700 15px/1 var(--serif);
+  width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center;
+  background: var(--gold); color: #1c1609; font: 700 21px/1 var(--serif);
 }
-.scard-mix { margin-top: 11px; font: 700 19px/1.25 var(--serif); }
-.scard-plus { color: var(--gold); }
-.scard-also { margin-top: 6px; font-size: 12.5px; color: var(--muted); }
-.scard-tier { margin-top: auto; padding-top: 10px; font-size: 13px; font-weight: 600; color: var(--gold); }
+.scard-mix { display: flex; flex-direction: column; gap: 2px; margin-top: 22px; font: 700 29px/1.12 var(--serif); }
+.scard-plus { color: var(--gold); font-size: 22px; line-height: 1.2; }
+.scard-also { margin-top: 10px; font-size: 13.5px; line-height: 1.45; color: #d9d2c4; }
+.scard-tier { margin-top: auto; padding-top: 16px; font-size: 14px; font-weight: 600; color: var(--gold); }
+.deck-ctl { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 2px; }
+.round {
+  width: 44px; height: 44px; flex-shrink: 0; display: grid; place-items: center; border-radius: 50%; color: var(--gold);
+  border: 1px solid var(--gold-line); background: var(--card); transition: background 0.25s, color 0.25s, transform 0.25s;
+}
+.round svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.round:hover { background: var(--gold); color: #1c1609; }
+.round:active { transform: scale(0.94); }
+/* Best-selling flavors: a flame with a slow ember ping (shape and legend, not colour alone) */
+.best-legend { display: flex; align-items: center; gap: 8px; margin: 14px 0 12px; font-size: 13px; line-height: 1.35; color: #d9d2c4; }
+.flame { position: relative; display: inline-grid; place-items: center; width: 18px; height: 18px; flex-shrink: 0; color: var(--gold); }
+.flame svg { position: relative; width: 15px; height: 15px; fill: currentColor; }
+.flame i { position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid var(--gold); opacity: 0; animation: ember 2.8s cubic-bezier(0.22, 0.61, 0.36, 1) infinite; }
+@keyframes ember { 0% { transform: scale(0.7); opacity: 0.85; } 70%, 100% { transform: scale(2.1); opacity: 0; } }
+.flavor.best { display: inline-flex; align-items: center; border-color: var(--gold); background: var(--gold-soft); color: var(--text); font-weight: 600; }
+.flavor.best .flame { margin: -1px 6px 0 -4px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .scard-tier .price { font-size: 13px; }
 
 /* Happy hour: body.hh is set while the discount is live. */
@@ -391,7 +435,7 @@ body:not(.hh) .hh-on, body.hh .hh-off { display: none; }
 .age-badge { display: inline-block; padding: 0 6px; line-height: 1.5; border-radius: 6px; border: 1px solid var(--gold-line); color: var(--gold); font-size: 11px; font-weight: 800; letter-spacing: 0.02em; }
 
 /* Search ---------------------------------------------------------------- */
-body.searching .rail:not(.drail), body.searching .drail > [aria-hidden="true"], body.searching .hero, body.searching .wifi-panel, body.searching .kitchen, body.searching #featured { display: none; }
+body.searching .deck, body.searching .best-legend, body.searching .rail:not(.drail), body.searching .drail > [aria-hidden="true"], body.searching .hero, body.searching .wifi-panel, body.searching .kitchen, body.searching #featured { display: none; }
 .empty-state { padding: 60px var(--gutter); text-align: center; color: var(--muted); }
 
 /* Footer ---------------------------------------------------------------- */
@@ -451,3 +495,16 @@ body.searching .rail:not(.drail), body.searching .drail > [aria-hidden="true"], 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }
+
+/* Unavailable (marked by staff in the panel): greyed out only; the label is screen-reader text. */
+.row.out .row-name, .row.out .row-desc, .row.out .row-extra, .row.out .price, .row.out .thumb { opacity: 0.4; }
+.gcard.out img, .pcard.out img { filter: grayscale(1) brightness(0.55); }
+.gcard.out .gcard-name, .pcard.out .pcard-name { opacity: 0.6; }
+.gcard.out .gcard-price, .pcard.out .pcard-price { color: var(--muted); }
+.dtile.out { opacity: 0.45; }
+.flavor.out { opacity: 0.35; }
+
+/* Demo switch (only shown with ?demo in the URL). */
+.demo-btn { height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--muted);
+  font: 600 12.5px/1 var(--sans); letter-spacing: 0.02em; transition: color 0.25s, border-color 0.25s, background 0.25s; }
+.demo-btn[aria-pressed="true"] { border-color: var(--gold-line); background: var(--gold-soft); color: var(--gold); }

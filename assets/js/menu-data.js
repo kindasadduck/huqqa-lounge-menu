@@ -104,8 +104,10 @@ window.MENU = {
             v(i(["Lentil Soup", "Mercimek Çorbası"], "$8.99", "lentil-soup", ["Red lentils, carrots, potatoes, onions and spices.", "Kırmızı mercimek, havuç, patates, soğan ve baharat."])),
             v(i(["Hummus", "Humus"], "$8.50", "hummus", ["Chickpeas, tahini, garlic, olive oil and lemon.", "Nohut, tahin, sarımsak, zeytinyağı ve limon."],
               ["Add beef +$6 · add chicken +$5", "Etli +$6 · tavuklu +$5"])),
-            v(i(["Labneh", "Labne"], "$8.50", "labneh", ["Strained yogurt with olive oil.", "Zeytinyağlı süzme yoğurt."])),
-            v(i(["Baba Ganoush", "Baba Ganuş"], "$8.50", "baba-ganoush", ["Smoky charred eggplant with tahini, garlic and lemon.", "Tahin, sarımsak ve limonlu közlenmiş patlıcan."])),
+            v(i(["Labneh", "Labne"], "$8.50", "labneh", ["Strained yogurt with olive oil.", "Zeytinyağlı süzme yoğurt."],
+              ["Add chicken or köfte +$7", "Tavuk veya köfte ekle +$7"])),
+            v(i(["Baba Ganoush", "Baba Ganuş"], "$8.50", "baba-ganoush", ["Smoky charred eggplant with tahini, garlic and lemon.", "Tahin, sarımsak ve limonlu közlenmiş patlıcan."],
+              ["Add chicken or köfte +$7", "Tavuk veya köfte ekle +$7"])),
             v(i(["Cacık (Tzatziki)", "Cacık"], "$8.50", "cacik-tzatziki", ["Strained yogurt, cucumber, olive oil, garlic and mint.", "Süzme yoğurt, salatalık, zeytinyağı, sarımsak ve nane."])),
             v(i(["Ezme", "Ezme"], "$9.90", "ezme", ["Finely chopped tomatoes, cucumbers, onions, mild peppers, parsley and olive oil.", "İnce kıyılmış domates, salatalık, soğan, tatlı biber, maydanoz ve zeytinyağı."])),
             v(i(["Falafel (6)", "Falafel (6)"], "$9.50", "falafel-6", ["Chickpeas, parsley, tomatoes, cilantro and spices.", "Nohut, maydanoz, domates, kişniş ve baharat."])),
@@ -142,11 +144,16 @@ window.MENU = {
       groups: [
         {
           items: [
-            v(i(["Gavurdağı Salad", "Gavurdağı Salatası"], "$9.99", "gavurdagi-salad", ["Cucumbers, tomatoes, parsley, onions, peppers, walnuts, pomegranate sauce and olive oil.", "Salatalık, domates, maydanoz, soğan, biber, ceviz, nar ekşisi ve zeytinyağı."])),
-            v(i(["Fattoush Salad", "Fattuş Salatası"], "$9.99", "fattoush-salad", ["Lettuce, tomatoes, cucumbers, mint, parsley, crispy pita, sumac, lemon and olive oil.", "Marul, domates, salatalık, nane, maydanoz, çıtır pide, sumak, limon ve zeytinyağı."])),
-            v(i(["Tabouleh", "Tabule"], "$9.99", "tabouleh", ["Parsley, cracked wheat, mint, tomatoes, lemon and olive oil.", "Maydanoz, bulgur, nane, domates, limon ve zeytinyağı."])),
-            v(i(["Shepherd's Salad", "Çoban Salata"], "$9.99", "shepperd-salad", ["Lettuce, cucumber, tomato, onion, green pepper.", "Marul, salatalık, domates, soğan, yeşil biber."])),
-            v(i(["Mediterranean Salad", "Akdeniz Salatası"], "$9.99", "mediterranean-salad", ["Lettuce, cucumber, tomato, onion, feta, black olives.", "Marul, salatalık, domates, soğan, beyaz peynir, siyah zeytin."])),
+            v(i(["Gavurdağı Salad", "Gavurdağı Salatası"], "$9.99", "gavurdagi-salad", ["Cucumbers, tomatoes, parsley, onions, peppers, walnuts, pomegranate sauce and olive oil.", "Salatalık, domates, maydanoz, soğan, biber, ceviz, nar ekşisi ve zeytinyağı."],
+              ["Add chicken or köfte +$7", "Tavuk veya köfte ekle +$7"])),
+            v(i(["Fattoush Salad", "Fattuş Salatası"], "$9.99", "fattoush-salad", ["Lettuce, tomatoes, cucumbers, mint, parsley, crispy pita, sumac, lemon and olive oil.", "Marul, domates, salatalık, nane, maydanoz, çıtır pide, sumak, limon ve zeytinyağı."],
+              ["Add chicken or köfte +$7", "Tavuk veya köfte ekle +$7"])),
+            v(i(["Tabouleh", "Tabule"], "$9.99", "tabouleh", ["Parsley, cracked wheat, mint, tomatoes, lemon and olive oil.", "Maydanoz, bulgur, nane, domates, limon ve zeytinyağı."],
+              ["Add chicken or köfte +$7", "Tavuk veya köfte ekle +$7"])),
+            v(i(["Shepherd's Salad", "Çoban Salata"], "$9.99", "shepperd-salad", ["Lettuce, cucumber, tomato, onion, green pepper.", "Marul, salatalık, domates, soğan, yeşil biber."],
+              ["Add chicken or köfte +$7", "Tavuk veya köfte ekle +$7"])),
+            v(i(["Mediterranean Salad", "Akdeniz Salatası"], "$9.99", "mediterranean-salad", ["Lettuce, cucumber, tomato, onion, feta, black olives.", "Marul, salatalık, domates, soğan, beyaz peynir, siyah zeytin."],
+              ["Add chicken or köfte +$7", "Tavuk veya köfte ekle +$7"])),
           ],
         },
       ],
@@ -329,7 +336,10 @@ window.MENU = {
             plus: ["Flavored +$1", "Aromalı +$1"],
             more: d(["Flavored Tea Pot", "Aromalı Demlik Çay"], "$19.99", null,
               { note: ["The Tea Pot with a flavored tea instead, $1 extra.", "Demlik, aromalı çay ile; $1 fark."], flavors: TEAS }) },
-          { name: ["Small Pot", "Küçük Demlik"], search: ["Small Turkish Tea Pot", "Küçük Demlik Çay"], price: "$14.99", img: "small-turkish-tea-pot" },
+          { name: ["Small Pot", "Küçük Demlik"], search: ["Small Turkish Tea Pot", "Küçük Demlik Çay"], price: "$14.99", img: "small-turkish-tea-pot",
+            plus: ["Flavor choice", "Aroma seçimi"],
+            more: d(["Flavored Small Pot", "Aromalı Küçük Demlik"], "$14.99", null,
+              { note: ["The Small Pot with a flavored tea instead, same price.", "Küçük demlik, aromalı çay ile; aynı fiyat."], flavors: TEAS }) },
           { name: ["Glass", "Bardak"], search: ["Turkish Tea Glass", "Bardak Çay"], price: "$2.99", img: "turkish-tea-glass" },
           // Full-width strip under the three tea tiles.
           { name: ["Flavored Tea", "Bitki Çayı"], sub: ["Mug", "Kupa"], price: "$4.90", img: "flavored-tea", wide: true,
@@ -440,7 +450,7 @@ window.MENU = {
           flavors: ["Double Apple", "Double Apple Mint", "Mint", "Orange", "Orange Mint", "Gum Mint", "Grape", "Grape Mint",
             "Grapefruit Mint", "Lemon Mint", "Citrus Mint", "Watermelon", "Watermelon Mint", "Gum and Cinnamon",
             "Blueberry Mint", "Peach", "Peach Mint", "Cappuccino", "Berry Mix", "Rose", "Mango", "Pineapple", "Cherry Mint",
-            "Kiwi", "Guava", "Melon", "Vanilla", "Wild Berry Mint", "Marbella", "Mint Cream", "Chewing Gum"],
+            "Kiwi", "Guava", "Melon", "Vanilla", "Wild Berry Mint", "Mint Cream", "Chewing Gum"],
         },
         {
           // Every brand except Al Fakher is premium. Flavors are listed brand by brand.
@@ -450,13 +460,13 @@ window.MENU = {
           flavors: ["Blue Mist", "Blue Mist Mint", "Pink", "Tropicool", "Tropicool Mint", "Code 69", "Melon Blue",
             "Safari Melon Dew", "Irish Peach", "Sex on the Beach", "White Peach", "Queen of Sex",
             "Skyfall", "Love 66", "Lady Killer", "Baku Nights", "Berlin Nights", "Mi Amor",
-            "Ice Lemon Mint", "Ice Orange", "Ice Blueberry", "Istanbul Nights", "Lime Spice Peach", "Toasted Berry",
+            "Ice Lemon Mint", "Ice Orange", "Ice Blueberry", "Istanbul Nights", "Lime Spice Peach", "Toasted Berry", "Marbella",
             "Pan"],
           brandOf: {
             Starbuzz: ["Blue Mist", "Blue Mist Mint", "Pink", "Tropicool", "Tropicool Mint", "Code 69", "Melon Blue",
               "Safari Melon Dew", "Irish Peach", "Sex on the Beach", "White Peach", "Queen of Sex"],
             Adalya: ["Skyfall", "Love 66", "Lady Killer", "Baku Nights", "Berlin Nights", "Mi Amor"],
-            Serbetli: ["Ice Lemon Mint", "Ice Orange", "Ice Blueberry", "Istanbul Nights", "Lime Spice Peach", "Toasted Berry"],
+            Serbetli: ["Ice Lemon Mint", "Ice Orange", "Ice Blueberry", "Istanbul Nights", "Lime Spice Peach", "Toasted Berry", "Marbella"],
             Afzal: ["Pan"],
           },
         },
@@ -464,6 +474,8 @@ window.MENU = {
       // Servers' favorite bowls, shown as a sliding rail under the flavor lists. Each pick is one bowl
       // (a mix when it has several flavors); the first is the headline, the rest show as "Also loves".
       // An optional note shows under the mix.
+      // Best-selling flavors (placeholder until Can sends the real list); they get a flame in the flavor lists.
+      bestsellers: ["Mango", "Double Apple", "Baku Nights", "Ice Lemon Mint"],
       staffPicks: [
         { name: "Wafaa", title: ["Wafaa's pick", "Wafaa'nın seçimi"], picks: [["Ice Lemon Mint", "Mango"], ["Marbella"]] },
         { name: "Esma", title: ["Esma's pick", "Esma'nın seçimi"], picks: [["Lime Spice Peach", "Mi Amor"]] },

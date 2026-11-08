@@ -1,5 +1,7 @@
 (() => {
-  const M = window.MENU;
+  // Base menu from menu-data.js; live admin changes (/api/state) are applied to a fresh copy of it.
+  const BASE = structuredClone(window.MENU);
+  let M = window.MENU;
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
@@ -8,6 +10,12 @@
     ourMenu: ["Our <em>Menu</em>", "<em>Menümüz</em>"],
     halal: ["100% Halal", "%100 Helal"],
     featured: ["Featured", "Öne Çıkanlar"],
+    openSections: ["Open sections menu", "Bölüm menüsünü aç"],
+    closeSections: ["Close sections menu", "Bölüm menüsünü kapat"],
+    prev: ["Previous", "Önceki"],
+    next: ["Next", "Sonraki"],
+    bestSeller: ["Best seller", "Çok satan"],
+    bestLegend: ["Best sellers: what guests order most", "Çok satanlar: en çok sipariş edilenler"],
     featuredTag: ["House favorites", "Favoriler"],
     bestSellers: ["Best sellers", "Çok satanlar"],
     details: ["Details", "Detaylar"],
@@ -36,6 +44,7 @@
     password: ["Password", "Şifre"],
     copy: ["Copy", "Kopyala"],
     copied: ["Copied", "Kopyalandı"],
+    out: ["Not available today", "Bugün yok"],
   };
 
   const ICON = {
@@ -57,7 +66,11 @@
   const L = (pair) => (pair ? pair[lang === "tr" ? 1 : 0] : "");
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const fold = (s) => s.toLocaleLowerCase("tr").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/ı/g, "i");
-  const img = (slug, size) => `assets/img/${slug}${size ? `-${size}` : ""}.webp`;
+  // "r2:<slug>" = a photo uploaded from the admin panel, served from R2 at /media (site root; the menu lives at /menu/).
+  const img = (slug, size) => {
+    const r2 = slug.startsWith("r2:");
+    return `${r2 ? "/media" : "assets/img"}/${r2 ? slug.slice(3) : slug}${size ? `-${size}` : ""}.webp`;
+  };
   // Cards load the 800px photo on most phones and the 1200px one on dense screens. `sizes` is about how
   // wide the photo is drawn (object-fit: cover on a short card draws it wider than the card itself).
   const srcset = (slug) => `${img(slug, "md")} 800w, ${img(slug)} 1200w`;
@@ -65,47 +78,52 @@
   const FULL = "min(100vw, 560px)";
   const findItem = (sectionId, name) => {
     const s = M.sections.find((x) => x.id === sectionId);
-    for (const g of s.groups) for (const it of g.items) if (it.name[0] === name) return [it, s];
-    throw new Error(`Menu item not found: ${sectionId} / ${name}`);
+    for (const g of s.groups) for (const it of g.items) if ((it._baseName || it.name)[0] === name) return [it, s];
+    return null; // hidden from the admin panel
   };
 
   // ---- rendering ----------------------------------------------------------
   const veg = (it) => (it.veg ? ` <span class="veg" title="${esc(L(UI.vegetarian))}" aria-label="${esc(L(UI.vegetarian))}">V</span>` : "");
+  // Marked unavailable by staff: shown greyed out (Can, 2026-11-08: no visible tag for now); screen readers
+  // still hear "not available today". Stays until staff clear it.
+  const outCls = (it) => (it.unavailable ? " out" : "");
+  const outTag = (it) => (it.unavailable ? `<span class="sr">, ${esc(L(UI.out))}</span>` : "");
 
   const photoCard = (it, kicker, sizes = "350px") => `
-    <button type="button" class="pcard" data-photo="${it.img}" data-name="${esc(L(it.name))}" data-price="${esc(it.price)}">
-      <img loading="lazy" ${pic(it.img, sizes)} alt="">
+    <${it.img ? "button" : "div"} ${it.img ? 'type="button" ' : ""}class="pcard${outCls(it)}"${it.img ? ` data-photo="${esc(it.img)}"` : ""} data-name="${esc(L(it.name))}" data-price="${esc(it.price)}">
+      ${it.img ? `<img loading="lazy" ${pic(it.img, sizes)} alt="">` : `<span class="dph" aria-hidden="true">${ICON.cup}</span>`}
       <div class="pcard-body">
         ${kicker ? `<div class="kicker">${esc(kicker)}</div>` : ""}
         <div class="pcard-name">${esc(L(it.name))}${veg(it)}</div>
         ${it.desc ? `<div class="pcard-desc">${esc(L(it.desc))}</div>` : ""}
-        <div class="pcard-price">${esc(it.price)}</div>
+        <div class="pcard-price">${esc(it.price)}${outTag(it)}</div>
       </div>
-    </button>`;
+    </${it.img ? "button" : "div"}>`;
 
   // Names and descriptions in both languages, so "adana" also finds the Huqqa Mix Kebab.
   const searchKey = (it) => esc(fold([...it.name, ...(it.desc || []), ...(it.extra || []), ...(it.veg ? UI.vegetarian : [])].join(" ")));
 
   const row = (it) => {
     const thumb = it.img
-      ? `<button type="button" class="thumb" data-photo="${it.img}" data-name="${esc(L(it.name))}" data-price="${esc(it.price)}" aria-label="${esc(L(it.name))}">
+      ? `<button type="button" class="thumb" data-photo="${esc(it.img)}" data-name="${esc(L(it.name))}" data-price="${esc(it.price)}" aria-label="${esc(L(it.name))}">
            <img src="${img(it.img, "sm")}" alt="" loading="lazy" width="64" height="64"></button>`
       : `<div class="thumb empty" aria-hidden="true">${ICON.cup}</div>`;
     return `
-      <div class="row" data-search="${searchKey(it)}">
+      <div class="row${outCls(it)}" data-search="${searchKey(it)}">
         ${thumb}
         <div>
           <div class="row-name">${esc(L(it.name))}${veg(it)}</div>
           ${it.desc ? `<div class="row-desc">${esc(L(it.desc))}</div>` : ""}
           ${it.extra ? `<div class="row-extra">${esc(L(it.extra))}</div>` : ""}
+          ${outTag(it)}
         </div>
         <div class="price">${esc(it.price)}</div>
       </div>`;
   };
 
   const plainRow = (it) => `
-    <div class="row plain" data-search="${searchKey(it)}"${it.brands ? ` data-brands="${esc(it.brands.join("|"))}"` : ""}>
-      <div class="row-name">${esc(L(it.name))}${veg(it)}</div>
+    <div class="row plain${outCls(it)}" data-search="${searchKey(it)}"${it.brands ? ` data-brands="${esc(it.brands.join("|"))}"` : ""}>
+      <div class="row-name">${esc(L(it.name))}${veg(it)}${outTag(it)}</div>
       <div class="price">${esc(it.price)}</div>
     </div>`;
 
@@ -126,8 +144,10 @@
   };
 
   const carousel = (s) => {
-    if (!s.carousel) return "";
-    const cards = s.carousel.map((name) => photoCard(findItem(s.id, name)[0]));
+    if (!s.carousel && !s.carouselKeys) return "";
+    const found = s.carouselKeys ? s.carouselKeys.map((k) => window.HQ.findByKey(M, k)) : s.carousel.map((name) => findItem(s.id, name));
+    const cards = found.filter((f) => f && f[0].img).map((f) => photoCard(f[0]));
+    if (!cards.length) return "";
     return `<h3 class="sub">${esc(L(UI.bestSellers))}</h3>${rail(cards)}
       <div class="divider" aria-hidden="true"><span></span></div>`;
   };
@@ -142,13 +162,13 @@
          data-desc="${esc(L(it.desc))}" data-extra="${esc(L(it.extra))}"`
       : "";
     return `
-      <${tag} class="gcard${wide ? " wide" : ""}" ${attrs} data-search="${searchKey(it)}"
+      <${tag} class="gcard${wide ? " wide" : ""}${outCls(it)}" ${attrs} data-search="${searchKey(it)}"
               data-name="${esc(L(it.name))}" data-price="${esc(it.price)}">
-        <img loading="lazy" ${pic(it.img, wide ? FULL : "264px")} alt=""${it.focus ? ` style="object-position: ${it.focus} 50%"` : ""}>
+        ${it.img ? `<img loading="lazy" ${pic(it.img, wide ? FULL : "264px")} alt=""${it.focus ? ` style="object-position: ${it.focus} 50%"` : ""}>` : `<span class="dph" aria-hidden="true">${ICON.cup}</span>`}
         <div class="gcard-body">
           <div class="gcard-text">
             <div class="gcard-name">${esc(L(it.name))}${veg(it)}</div>
-            <div class="gcard-price">${esc(it.price)}</div>
+            <div class="gcard-price">${esc(it.price)}${outTag(it)}</div>
           </div>
           ${tappable ? `<span class="gcard-arrow" aria-hidden="true">${ICON.chevron}</span>` : ""}
         </div>
@@ -160,6 +180,14 @@
     <div class="group">
       ${g.title ? `<h3 class="sub">${esc(L(g.title))}</h3>` : ""}
       <div class="grid">${g.items.map((it, n) => gridCard(it, n === 0 && g.items.length % 2 === 1)).join("")}</div>
+      ${note(g.note)}
+    </div>`;
+
+  // A panel-made group shown as a sliding rail (same cards and details bar as the drink rails).
+  const railGroup = (g) => `
+    <div class="group">
+      ${g.title ? `<h3 class="sub">${esc(L(g.title))}</h3>` : ""}
+      ${g.items.length ? `${rail(g.items.map((it) => gridCard(it)), "drail")}<div class="dslot"></div>` : ""}
       ${note(g.note)}
     </div>`;
 
@@ -200,24 +228,45 @@
     const words = [p.name, ...p.picks.flat()];
     return `<div class="scard" data-search="${esc(fold(words.join(" ")))}">
       <div class="scard-head"><span class="scard-av" aria-hidden="true">${esc(p.name[0])}</span>${esc(L(p.title))}</div>
-      <div class="scard-mix">${main.map(esc).join(' <span class="scard-plus">+</span> ')}</div>
+      <div class="scard-mix">${main.map((f) => `<span>${esc(f)}</span>`).join('<span class="scard-plus" aria-hidden="true">+</span>')}</div>
       ${p.note ? `<div class="scard-also">${esc(L(p.note))}</div>` : ""}
       ${more.length ? `<div class="scard-also">${esc(L(UI.alsoLoves))} ${more.map((m) => esc(m.join(" + "))).join(", ")}</div>` : ""}
       <div class="scard-tier">${esc(L(tier ? UI.premium : UI.classic))} · ${tierPrice(t.price, s.happyHour && t.hhDiscount)}</div>
     </div>`;
   };
-  const staffPicks = (s) => (s.staffPicks
-    ? `<h3 class="sub">${esc(L(UI.staffPicks))}</h3>${rail(s.staffPicks.map((p) => staffCard(s, p)), "srail")}`
-    : "");
+  // Deck: one big card per server, steps to the next on a timer and loops forever (the set is cloned either side, like the rails).
+  const ARROW = { l: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>', r: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>' };
+  const staffPicks = (s) => {
+    if (!s.staffPicks) return "";
+    const cards = s.staffPicks.map((p) => staffCard(s, p));
+    const clones = cards.map((c) => c.replace(/^(\s*<\w+) /, '$1 aria-hidden="true" ')).join("");
+    return `<h3 class="sub">${esc(L(UI.staffPicks))}</h3>
+      <div class="deck" data-deck>
+        <div class="deck-track" role="group" tabindex="0" aria-label="${esc(L(UI.staffPicks))}" data-count="${cards.length}">${clones}${cards.join("")}${clones}</div>
+        <div class="deck-ctl">
+          <button type="button" class="round" data-dir="-1" aria-label="${esc(L(UI.prev))}">${ARROW.l}</button>
+          <button type="button" class="round" data-dir="1" aria-label="${esc(L(UI.next))}">${ARROW.r}</button>
+        </div>
+      </div>`;
+  };
+
+  // Best sellers get a flame with a slow ember ping (shape plus a screen-reader label, never colour alone).
+  const FLAME = '<span class="flame" aria-hidden="true"><i></i><svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span>';
+  const flavorChip = (s, t, f) => {
+    const best = (s.bestsellers || []).includes(f);
+    const out = (s.unavailableFlavors || []).includes(f);
+    return `<span class="flavor${best ? " best" : ""}${out ? " out" : ""}" data-search="${esc(fold(f))}" data-brands="${esc(brandOf(t, f))}">${best ? FLAME : ""}${esc(f)}${best ? `<span class="sr">, ${esc(L(UI.bestSeller))}</span>` : ""}${out ? `<span class="sr">, ${esc(L(UI.out))}</span>` : ""}</span>`;
+  };
+  const bestLegend = (s) => ((s.bestsellers || []).length ? `<p class="best-legend">${FLAME}<span>${esc(L(UI.bestLegend))}</span></p>` : "");
 
   const hookah = (s) => {
     const tiers = s.tiers.map((t) => `
       <div class="tier" data-search="${esc(fold(t.title.join(" ")))}" data-brands="${esc([t.brand, ...Object.keys(t.brandOf || {})].filter(Boolean).join("|"))}">
         <div class="tier-head"><h3>${esc(L(t.title))}</h3>${tierPrice(t.price, s.happyHour && t.hhDiscount)}</div>
-        <div class="flavors">${t.flavors.map((f) => `<span class="flavor" data-search="${esc(fold(f))}" data-brands="${esc(brandOf(t, f))}">${esc(f)}</span>`).join("")}</div>
+        <div class="flavors">${t.flavors.map((f) => flavorChip(s, t, f)).join("")}</div>
       </div>`).join("");
     const age = s.age ? `<p class="age">${esc(L(s.age)).replace("{21}", '<span class="age-badge">21+</span>')}</p>` : "";
-    return happyHour(s.happyHour) + tiers + staffPicks(s) + s.groups.map((g) => group(g, plainRow)).join("") + age;
+    return happyHour(s.happyHour) + bestLegend(s) + tiers + staffPicks(s) + s.groups.map((g) => group(g, plainRow)).join("") + age;
   };
 
   // ---- drinks -------------------------------------------------------------
@@ -245,14 +294,14 @@
       : "";
     const photo = drinkPhoto(it);
     return `
-      <${tag} class="gcard${wide ? " wide" : ""}" ${attrs} data-search="${drinkSearch(it)}">
+      <${tag} class="gcard${wide ? " wide" : ""}${outCls(it)}" ${attrs} data-search="${drinkSearch(it)}">
         ${photo ? `<img loading="lazy" ${pic(photo, wide ? FULL : "320px")} alt=""${it.focus ? ` style="object-position: ${it.focus} 50%"` : ""}>` : `<span class="dph" aria-hidden="true">${ICON.cup}</span>`}
         ${it.temps ? `<span class="dtemp" aria-hidden="true">${ICON.hot}${ICON.iced}</span>` : ""}
         ${it.flavors && it.flavors.length > 2 ? `<span class="dcount">${it.flavors.length} ${esc(L(UI.flavorCount))}</span>` : ""}
         <div class="gcard-body">
           <div class="gcard-text">
             <div class="gcard-name">${esc(L(it.name))}</div>
-            <div class="gcard-price">${esc(it.price)}</div>
+            <div class="gcard-price">${esc(it.price)}${outTag(it)}</div>
           </div>
           ${tappable ? `<span class="gcard-arrow" aria-hidden="true">${ICON.chevron}</span>` : ""}
         </div>
@@ -280,14 +329,14 @@
   const drinksHero = (h) => {
     const tiles = h.tiles.map((t, k) => {
       const more = t.more ? drinkList.push(t.more) - 1 : -1;
-      if (t.wide) return `<button type="button" class="dtile wide" data-swap="${t.img}" aria-pressed="${k === heroPick}"
+      if (t.wide) return `<button type="button" class="dtile wide${outCls(t)}" data-swap="${esc(t.img)}" aria-pressed="${k === heroPick}"
           aria-expanded="false" data-drink="${more}">
         <span>${esc(L(t.name))} <small>· ${esc(L(t.sub))}</small></span>
         <span class="dtile-end"><span class="dtile-plus">${t.more.flavors.length} ${esc(L(UI.flavorCount))}</span><b>${esc(t.price)}</b></span>
       </button>`;
-      return `<button type="button" class="dtile" data-swap="${t.img}" aria-pressed="${k === heroPick}"
+      return `<button type="button" class="dtile${outCls(t)}" data-swap="${esc(t.img)}" aria-pressed="${k === heroPick}"
           ${more >= 0 ? `aria-expanded="false" data-drink="${more}"` : ""}>
-        ${esc(L(t.name))}<b>${esc(t.price)}</b>${t.plus ? `<span class="dtile-plus">${esc(L(t.plus))}</span>` : ""}
+        ${esc(L(t.name))}<b>${esc(t.price)}</b>${outTag(t)}${t.plus ? `<span class="dtile-plus">${esc(L(t.plus))}</span>` : ""}
       </button>`;
     }).join("");
     const words = [h.title].concat(...h.tiles.map((t) => [t.name, t.search, t.more && t.more.name].concat(t.more ? t.more.flavors : [])));
@@ -314,7 +363,7 @@
       ${note(g.note)}
     </div>`;
 
-  const drinks = (s) => { drinkList = []; return drinksHero(s.hero) + s.groups.map(drinksGroup).join(""); };
+  const drinks = (s) => { drinkList = []; return carousel(s) + drinksHero(s.hero) + s.groups.map(drinksGroup).join(""); };
 
   function swapPhoto(el, slug) {
     const im = $("img", el);
@@ -352,11 +401,13 @@
 
   const section = (s) => {
     let body;
-    if (s.layout === "grid") body = carousel(s) + s.groups.map(gridGroup).join("") + note(s.note);
+    // Groups opened in the staff panel carry their own layout (rail | grid | list).
+    const own = (g, fallback) => (g._layout === "rail" ? railGroup(g) : g._layout === "grid" ? gridGroup(g) : g._layout === "list" ? group(g) : fallback(g));
+    if (s.layout === "grid") body = carousel(s) + s.groups.map((g) => own(g, gridGroup)).join("") + note(s.note);
     else if (s.layout === "hookah") body = hookah(s);
     else if (s.layout === "drinks") body = drinks(s);
-    else if (s.layout === "plain") body = s.groups.map((g) => group(g, plainRow)).join("");
-    else body = carousel(s) + s.groups.map((g) => group(g)).join("");
+    else if (s.layout === "plain") body = carousel(s) + s.groups.map((g) => (g._layout ? own(g) : group(g, plainRow))).join("");
+    else body = carousel(s) + s.groups.map((g) => own(g, group)).join("");
     return `
       <section class="section" id="${s.id}">
         <div class="section-head"><h2>${esc(L(s.title))}</h2>${s.brandFilter ? brandButtons(s) : s.badge ? `<span class="sec-badge">${ICON.clock}${esc(L(s.badge))}</span>` : `<span class="section-tag">${esc(L(s.tag))}</span>`}</div>
@@ -365,10 +416,9 @@
   };
 
   const featured = () => {
-    const cards = M.featured.map(([sid, name]) => {
-      const [it, s] = findItem(sid, name);
-      return photoCard(it, L(s.tabTitle || s.title), "450px");
-    });
+    const found = M.featuredKeys ? M.featuredKeys.map((k) => window.HQ.findByKey(M, k)) : M.featured.map(([sid, name]) => findItem(sid, name));
+    const cards = found.filter((f) => f && f[0].img)
+      .map(([it, s]) => photoCard(it, L(s.tabTitle || s.title), "450px"));
     return `
       <section class="section" id="featured">
         <div class="section-head"><h2>${esc(L(UI.featured))}</h2><span class="section-tag">${esc(L(UI.featuredTag))}</span></div>
@@ -413,9 +463,10 @@
 
   // The pinned section (hookah) is left out of the scrolling tab list; it has its own tab on the right.
   const PINNED = "hookah";
+  const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   const tabs = () => [{ id: "featured", label: L(UI.featured) }]
     .concat(M.sections.filter((s) => s.id !== PINNED).map((s) => ({ id: s.id, label: L(s.tabTitle || s.title) })))
-    .map((t) => `<a class="tab" href="#${t.id}" data-target="${t.id}">${esc(t.label)}</a>`).join("");
+    .map((t) => `<a class="mlink${t.id === "featured" ? " wide" : ""}" href="#${t.id}" data-target="${t.id}"><span>${esc(t.label)}</span>${CHECK}</a>`).join("");
 
   function render() {
     document.documentElement.lang = lang;
@@ -424,7 +475,8 @@
     $$("[data-i18n-label]").forEach((el) => el.setAttribute("aria-label", L(UI[el.dataset.i18nLabel])));
     $$("[data-i18n-placeholder]").forEach((el) => (el.placeholder = L(UI[el.dataset.i18nPlaceholder])));
 
-    $("#tabs").innerHTML = tabs();
+    $("#secMenu").innerHTML = tabs();
+    setSecMenu(false);
     const pinned = M.sections.find((x) => x.id === PINNED);
     $("#pinnedTab").innerHTML = esc(L(pinned.title)) +
       (pinned.happyHour ? ` <span class="hh-badge hh-on">HH</span>` : "");
@@ -437,6 +489,7 @@
     activeId = null;
     updateActive();
     setupRails();
+    setupDecks();
     updateHappyHour();
     updateKitchen();
     applyBrand();
@@ -513,14 +566,7 @@
     if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) current = sections[sections.length - 1];
     if (current.id === activeId) return;
     activeId = current.id;
-    $$(".tab").forEach((t) => {
-      const on = t.dataset.target === activeId;
-      t.setAttribute("aria-current", String(on));
-      if (on && t.parentElement.id === "tabs") {
-        const bar = $("#tabs");
-        bar.scrollTo({ left: t.offsetLeft - (bar.clientWidth - t.offsetWidth) / 2, behavior: "smooth" });
-      }
-    });
+    $$(".tab, .mlink").forEach((t) => t.setAttribute("aria-current", String(t.dataset.target === activeId)));
   }
 
   let ticking = false;
@@ -540,6 +586,66 @@
     const el = document.getElementById(id);
     if (!el) return;
     window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - headerH + 1, behavior: "smooth" });
+  }
+
+  // ---- sections menu (hamburger); Hookah keeps its own button outside it ----------
+  function setSecMenu(open, back) {
+    const btn = $("#burger"), menu = $("#secMenu"), scrim = $("#secScrim");
+    if (!btn) return;
+    btn.setAttribute("aria-expanded", String(open));
+    btn.setAttribute("aria-label", L(open ? UI.closeSections : UI.openSections));
+    menu.inert = !open;
+    document.body.classList.toggle("sec-open", open);
+    if (open) scrim.hidden = false;
+    else setTimeout(() => { if (btn.getAttribute("aria-expanded") !== "true") scrim.hidden = true; }, reduceMotion.matches ? 0 : 560);
+    if (open) { const cur = $('.mlink[aria-current="true"]', menu) || $(".mlink", menu); if (cur) cur.focus({ preventScroll: true }); }
+    else if (back) btn.focus({ preventScroll: true });
+  }
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && document.body.classList.contains("sec-open")) setSecMenu(false, true); });
+
+  // ---- staff picks deck -----------------------------------------------------
+  function deckOf(el) {
+    const root = el.closest(".deck"), tr = $(".deck-track", root), cards = [...tr.children], n = +tr.dataset.count, pad = 16;
+    const setW = () => cards[n].offsetLeft - cards[0].offsetLeft;
+    const cur = () => cards.reduce((b, c, i) => (Math.abs(c.offsetLeft - pad - tr.scrollLeft) < Math.abs(cards[b].offsetLeft - pad - tr.scrollLeft) ? i : b), 0);
+    const at = (i) => cards[i].offsetLeft - pad;
+    const go = (i) => tr.scrollTo({ left: at(Math.max(0, Math.min(cards.length - 1, i))), behavior: reduceMotion.matches ? "auto" : "smooth" });
+    // Keep the view inside the middle copy: jump one set back/forward once scrolling has settled (identical cards, so no visible change).
+    const wrap = () => {
+      const w = setW();
+      if (!w) return;
+      if (tr.scrollLeft >= at(2 * n) - 2) tr.scrollLeft -= w;
+      else if (tr.scrollLeft < at(n) - 2) tr.scrollLeft += w;
+    };
+    return { root, tr, cards, n, cur, go, wrap };
+  }
+  // The deck advances every DECK_MS and loops; a touch, click or keyboard use pauses it for DECK_PAUSE_MS.
+  const DECK_MS = 4500;
+  const DECK_PAUSE_MS = 9000;
+  let deckTimers = [];
+  function setupDecks() {
+    deckTimers.forEach((t) => { clearInterval(t.id); t.io.disconnect(); });
+    deckTimers = [];
+    $$(".deck").forEach((root) => {
+      const d = deckOf(root);
+      d.tr.scrollLeft = d.cards[d.n].offsetLeft - 16; // start on the first real card (middle copy)
+      let settle = 0;
+      let pausedUntil = 0, visible = false;
+      const hold = () => { pausedUntil = performance.now() + DECK_PAUSE_MS; };
+      ["pointerdown", "touchstart", "wheel", "keydown", "focusin"].forEach((ev) => root.addEventListener(ev, hold, { passive: true }));
+      root.addEventListener("click", hold);
+      const io = new IntersectionObserver((es) => { visible = es[es.length - 1].isIntersecting; }, { threshold: 0.5 });
+      io.observe(root);
+      const id = setInterval(() => {
+        if (reduceMotion.matches || document.hidden || !visible || performance.now() < pausedUntil) return;
+        if (document.body.classList.contains("searching") || !$("#lightbox") || !$("#lightbox").hidden) return;
+        d.go(d.cur() + 1);
+      }, DECK_MS);
+      deckTimers.push({ id, io });
+      const mark = () => { const i = d.cur(); d.cards.forEach((c, k) => c.classList.toggle("is-on", k === i)); };
+      d.tr.addEventListener("scroll", () => { requestAnimationFrame(mark); clearTimeout(settle); settle = setTimeout(() => { d.wrap(); mark(); }, 140); }, { passive: true });
+      mark();
+    });
   }
 
   // ---- auto-scrolling rails ---------------------------------------------
@@ -672,9 +778,9 @@
       });
       return drinkBar(+card.dataset.drink);
     }
-    return `<div class="gbar-inner"><div class="gbar-head"><span>${card.dataset.name}</span><span class="price">${card.dataset.price}</span></div>
-      ${card.dataset.desc ? `<div class="gbar-desc">${card.dataset.desc}</div>` : ""}
-      ${card.dataset.extra ? `<div class="row-extra">${card.dataset.extra}</div>` : ""}</div>`;
+    return `<div class="gbar-inner"><div class="gbar-head"><span>${esc(card.dataset.name)}</span><span class="price">${esc(card.dataset.price)}</span></div>
+      ${card.dataset.desc ? `<div class="gbar-desc">${esc(card.dataset.desc)}</div>` : ""}
+      ${card.dataset.extra ? `<div class="row-extra">${esc(card.dataset.extra)}</div>` : ""}</div>`;
   };
 
   // Height animates to the bar's content, then goes back to auto so later changes (picked options) fit.
@@ -812,8 +918,13 @@
 
   // ---- events -------------------------------------------------------------
   document.addEventListener("click", (e) => {
-    const tab = e.target.closest(".tab");
-    if (tab) { e.preventDefault(); scrollToSection(tab.dataset.target); return; }
+    if (e.target.closest("#burger")) { setSecMenu($("#burger").getAttribute("aria-expanded") !== "true"); return; }
+    if (e.target.closest("#secScrim")) { setSecMenu(false, true); return; }
+    const tab = e.target.closest(".tab, .mlink");
+    if (tab) { e.preventDefault(); setSecMenu(false); scrollToSection(tab.dataset.target); return; }
+
+    const dir = e.target.closest(".deck .round");
+    if (dir) { const d = deckOf(dir); d.go(d.cur() + +dir.dataset.dir); return; }
 
     const photo = e.target.closest("[data-photo]");
     if (photo) {
@@ -888,5 +999,54 @@
 
   render();
   requestAnimationFrame((t) => { lastFrame = t; tick(t); });
+
+  // ---- live changes from the staff panel ------------------------------------
+  // The base menu renders first; /api/state (Cloudflare) is applied when it answers. Without the API
+  // (GitHub Pages, offline) the base menu simply stays. Re-checked when the tab becomes visible again.
+  let stateV = -1, lastCheck = 0;
+  async function loadState() {
+    if (!window.HQ || !/^https?:$/.test(location.protocol)) return;
+    if (demoBtn && demoBtn.getAttribute("aria-pressed") === "true") return; // demo view stays put
+    lastCheck = Date.now();
+    try {
+      const r = await fetch("/api/state", { cache: "no-cache" }); // root API; on GitHub Pages this 404s and the base menu stays
+      if (!r.ok || !(r.headers.get("content-type") || "").includes("json")) return;
+      const state = await r.json();
+      if ((state.v || 0) === stateV) return;
+      stateV = state.v || 0;
+      M = window.MENU = window.HQ.applyOverlay(structuredClone(BASE), state);
+      const anchor = activeId, y = window.scrollY;
+      render();
+      if (y > 0 && anchor) {
+        const el = document.getElementById(anchor);
+        if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - headerH + 1);
+      }
+    } catch (_) { /* keep the base menu */ }
+  }
+  // ---- demo switch (?demo in the URL, for showing the staff panel's effect) --------
+  // Toggles a fixed sample of staff changes on top of the base menu; the menu data itself is untouched.
+  const DEMO_STATE = {
+    v: -2,
+    unavailable: ["grill/Chicken Shawarma", "grill/Liver Shish Kebab", "breakfast/Menemen", "appetizers/Fries",
+      "desserts/Künefe", "drinks/Small Pot", "flavor:Mango", "flavor:Marbella", "flavor:Blue Mist"],
+  };
+  const demoBtn = $("#demoToggle");
+  if (/[?&]demo\b/.test(location.search) && demoBtn) {
+    demoBtn.hidden = false;
+    demoBtn.addEventListener("click", () => {
+      const on = demoBtn.getAttribute("aria-pressed") !== "true";
+      demoBtn.setAttribute("aria-pressed", String(on));
+      M = window.MENU = on ? window.HQ.applyOverlay(structuredClone(BASE), DEMO_STATE) : structuredClone(BASE);
+      stateV = on ? DEMO_STATE.v : -1;
+      const y = window.scrollY;
+      render();
+      window.scrollTo(0, y);
+    });
+  }
+
+  loadState();
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && Date.now() - lastCheck > 60000) loadState();
+  });
   if (document.fonts) document.fonts.ready.then(() => { measureHeader(); rails.forEach((r) => r.wrap()); });
 })();
