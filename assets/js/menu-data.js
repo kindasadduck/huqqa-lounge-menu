@@ -53,6 +53,7 @@ window.MENU = {
     ["breakfast", "Serpme Turkish Breakfast"],
     ["desserts", "Künefe"],
     ["grill", "Adana Kebab"],
+    ["appetizers", "Hummus"],
   ],
 
   sections: [
