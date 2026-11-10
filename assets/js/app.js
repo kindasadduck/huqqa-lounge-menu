@@ -67,12 +67,10 @@
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const fold = (s) => s.toLocaleLowerCase("tr").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/ı/g, "i");
   // "r2:<slug>" = a photo uploaded from the admin panel, served from R2 at /media (site root; the menu lives at /menu/).
-  // Resolve bundled photos beside this script, independent of the page's route.
-  const IMG_BASE = new URL("../img/", document.currentScript.src).href;
   const img = (slug, size) => {
     if (!/^(r2:)?[a-z0-9-]{2,60}$/.test(slug)) return "";   // same rule as the server; nothing else reaches an attribute
     const r2 = slug.startsWith("r2:");
-    return `${r2 ? "/media/" : IMG_BASE}${r2 ? slug.slice(3) : slug}${size ? `-${size}` : ""}.webp`;
+    return `${r2 ? "/media" : "assets/img"}/${r2 ? slug.slice(3) : slug}${size ? `-${size}` : ""}.webp`;
   };
   // Cards load the 800px photo on most phones and the 1200px one on dense screens. `sizes` is about how
   // wide the photo is drawn (object-fit: cover on a short card draws it wider than the card itself).
