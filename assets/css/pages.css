@@ -1,0 +1,62 @@
+/* Inner pages extend the chosen D bento system; shared chrome stays in site.css. */
+.d-about-heading{font-size:clamp(1.875rem,3vw,2.875rem);line-height:1.15;max-width:19ch}
+.d-about-story,.d-about-pause,.d-reserve-card,.d-visit-card,.d-contact-hours,.d-contact-social{padding:clamp(24px,3.4vw,48px)}
+.d-about-story,.d-about-pause{justify-content:center;gap:28px;min-height:400px}
+.d-about-story .d-copy,.d-about-pause .d-copy{max-width:60ch}
+.d-about-action{align-self:flex-start;margin-top:4px}
+.d-about-pause .d-row{margin-top:0;align-items:center;gap:16px 24px}
+.d-about-image{margin:0;padding:0;gap:0;min-height:400px}
+.d-about-image img{width:100%;height:100%;min-height:0;object-fit:cover;flex:1;aspect-ratio:6/5}
+.d-about-image figcaption{padding:16px 24px;font-size:.9375rem;background:var(--surface-2);color:var(--text)}
+.d-about-image--hookah img{object-position:center 44%;max-height:440px}
+.d-reserve-card{justify-content:center;gap:26px;min-height:360px}
+.d-reserve-card .d-lede{max-width:43ch}
+.d-reserve-action{align-self:flex-start;min-height:56px;padding:16px 28px;font-size:1.0625rem}
+.d-visit-card{justify-content:center;gap:26px;background:var(--surface-2)}
+.d-visit-card address{font-style:normal;font-size:clamp(1.125rem,1.7vw,1.5rem);line-height:1.6}
+.d-visit-card .d-text-link{align-self:flex-start}
+.d-contact-hours{gap:24px}
+.d-visit-hours{width:100%;border-collapse:collapse;font-size:1rem;font-variant-numeric:tabular-nums}
+.d-visit-hours th,.d-visit-hours td{padding:12px 0;line-height:1.5}
+.d-visit-hours th{font-weight:400;text-align:start;padding-inline-end:18px}
+.d-visit-hours td{text-align:end;white-space:nowrap}
+.d-kitchen-note{font-size:.9375rem;color:var(--muted)}
+.d-contact-social{gap:24px;justify-content:center}
+.d-social-links{display:grid;gap:12px}
+.d-social-links .d-text-link{display:inline-flex;align-items:center;min-height:44px}
+.d-gallery-page{max-width:1680px;margin-inline:auto}
+.d-gallery-page .d-gpage{padding-top:32px}
+.d-gallery-page .d-ghead{margin-bottom:28px}
+.d-gallery-page .d-ghead h1{font-size:clamp(2.5rem,5vw,4.5rem);line-height:1.08;font-weight:600;letter-spacing:-.02em}
+.d-gallery-page .d-ghead p{margin-top:16px}
+/* Preserve a visible non-color cue for the selected filter. */
+.d-gallery-page .d-chip-btn[aria-pressed="true"]{text-decoration:underline;text-underline-offset:.25em}
+.d-gallery-page .d-lb figcaption{min-height:3em}
+html:not(.js) .d-gallery-page .d-chips{display:none}
+@media(max-width:899.98px){
+ .d-about-story,.d-about-pause{min-height:0}
+ .d-about-image{min-height:0}
+ .d-about-image img{aspect-ratio:16/10;max-height:440px}
+ .d-about-image--hookah img{aspect-ratio:4/3;object-fit:contain;background:var(--bg)}
+ .d-reserve-card{min-height:300px}
+ .d-visit-card{min-height:250px}
+}
+@media(max-width:639.98px){
+ .d-about-page .d-page-title{font-size:2.5rem;max-width:11ch}
+ .d-about-heading{font-size:1.875rem;max-width:18ch}
+ .d-about-story,.d-about-pause,.d-reserve-card,.d-visit-card,.d-contact-hours,.d-contact-social{padding:24px;gap:22px}
+ .d-about-image figcaption{padding:16px 24px}
+ .d-reserve-card{min-height:0;padding-block:30px}
+ .d-reserve-action{width:100%}
+ .d-visit-hours{font-size:.875rem}
+ .d-visit-hours th{padding-inline-end:12px}
+ .d-gallery-page .d-gpage{padding-top:24px}
+ .d-gallery-page .d-ghead{gap:22px}
+ .d-gallery-page .d-masonry{padding-bottom:12px}
+ .d-gallery-page .d-lb figcaption{padding-inline:12px;font-size:.875rem}
+}
+@media(prefers-reduced-motion:no-preference){
+ .d-about-page .d-content-grid>.d-card:nth-child(2),.d-contact-page .d-content-grid>.d-card:nth-child(2){animation-delay:70ms}
+ .d-about-page .d-content-grid>.d-card:nth-child(3),.d-contact-page .d-content-grid>.d-card:nth-child(3){animation-delay:120ms}
+ .d-about-page .d-content-grid>.d-card:nth-child(4),.d-contact-page .d-content-grid>.d-card:nth-child(4){animation-delay:170ms}
+}
