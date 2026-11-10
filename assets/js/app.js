@@ -68,6 +68,7 @@
   const fold = (s) => s.toLocaleLowerCase("tr").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/ı/g, "i");
   // "r2:<slug>" = a photo uploaded from the admin panel, served from R2 at /media (site root; the menu lives at /menu/).
   const img = (slug, size) => {
+    if (!/^(r2:)?[a-z0-9-]{2,60}$/.test(slug)) return "";   // same rule as the server; nothing else reaches an attribute
     const r2 = slug.startsWith("r2:");
     return `${r2 ? "/media" : "assets/img"}/${r2 ? slug.slice(3) : slug}${size ? `-${size}` : ""}.webp`;
   };
@@ -605,7 +606,7 @@
 
   // ---- staff picks deck -----------------------------------------------------
   function deckOf(el) {
-    const root = el.closest(".deck"), tr = $(".deck-track", root), cards = [...tr.children], n = +tr.dataset.count, pad = 16;
+    const root = el.closest(".deck"), tr = $(".deck-track", root), cards = [...tr.children], n = +tr.dataset.count, pad = parseFloat(getComputedStyle(tr).paddingLeft) || 0;
     const setW = () => cards[n].offsetLeft - cards[0].offsetLeft;
     const cur = () => cards.reduce((b, c, i) => (Math.abs(c.offsetLeft - pad - tr.scrollLeft) < Math.abs(cards[b].offsetLeft - pad - tr.scrollLeft) ? i : b), 0);
     const at = (i) => cards[i].offsetLeft - pad;
@@ -628,7 +629,7 @@
     deckTimers = [];
     $$(".deck").forEach((root) => {
       const d = deckOf(root);
-      d.tr.scrollLeft = d.cards[d.n].offsetLeft - 16; // start on the first real card (middle copy)
+      d.tr.scrollLeft = d.cards[d.n].offsetLeft - (parseFloat(getComputedStyle(d.tr).paddingLeft) || 0); // start on the first real card (middle copy)
       let settle = 0;
       let pausedUntil = 0, visible = false;
       const hold = () => { pausedUntil = performance.now() + DECK_PAUSE_MS; };

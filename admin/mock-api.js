@@ -1,4 +1,4 @@
-// Mock API for the staff panel. Active only with ?mock=1 in the URL (admin.js loads this file then).
+// Mock API for the staff panel. Active on *.github.io, or with ?mock=1 on a local dev host (admin.js loads this file then).
 // Wraps window.fetch for /api/* and /media/*, follows docs/api.md to the letter, keeps its data in
 // localStorage ("hq-mock-db") so it survives a reload. Demo users: Can (admin, 1111), Eylül (server, 2222),
 // Mutfak (kitchen, 3333). Reset everything: HQ_MOCK.reset().
@@ -6,7 +6,8 @@
 // HQ_MOCK.setLatency(ms).
 // Not part of the contract (chosen here): 400 "invalid" for bad bodies, 404 "not_found", 409 "exists" for a duplicate user name.
 (function () {
-  if (!/[?&]mock=1\b/.test(location.search) && !/\.github\.io$/.test(location.hostname)) return;
+  const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\]|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)$/.test(location.hostname);
+  if (!/\.github\.io$/.test(location.hostname) && !(LOCAL && /[?&]mock=1\b/.test(location.search))) return;
   // Separate demo session per page (/admin vs /server) so both can be shown in one browser.
   const DB_KEY = "hq-mock-db", SESS_KEY = "hq-mock-sess" + ((document.body && document.body.dataset.demoRole) ? "-" + document.body.dataset.demoRole : "");
   const realFetch = window.fetch.bind(window);

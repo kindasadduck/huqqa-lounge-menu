@@ -508,3 +508,102 @@ body.searching .deck, body.searching .best-legend, body.searching .rail:not(.dra
 .demo-btn { height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--muted);
   font: 600 12.5px/1 var(--sans); letter-spacing: 0.02em; transition: color 0.25s, border-color 0.25s, background 0.25s; }
 .demo-btn[aria-pressed="true"] { border-color: var(--gold-line); background: var(--gold-soft); color: var(--gold); }
+
+/* =====================================================================
+   Wide screens: the phone menu, same parts and behaviour, just scaled up.
+   Burger + Hookah button, sliders, details bar all stay; the column simply
+   gets wider (720 / 960 / 1200) and shows more cards per view.
+   ===================================================================== */
+.deck-track { position: relative; } /* offsetLeft is measured from the track, not the page (setupDecks) */
+
+@media (min-width: 768px) {
+  :root { --maxw: 720px; --cols: 3; --gap: 10px; }
+  #menu, .foot, .top-row, .search, .tabs-wrap, .sec-menu { max-width: var(--maxw); }
+  .sec-menu { grid-template-columns: repeat(3, 1fr); }
+  .hero h1 { font-size: 48px; }
+  .section-head h2 { font-size: 42px; }
+
+  /* Sliders: same cards (height, crop), more of them in view. */
+  .pcard { flex-basis: 40%; }
+  .rail.big .pcard { flex-basis: 46%; }
+  .drail .gcard { flex-basis: 26%; }
+  .scard { flex-basis: 48%; }
+  /* Sliders start at the column edge: no sliver of the previous card on the left (Can, 2026-11-09). */
+  .rail, .deck-track { margin-inline: 0; padding-inline: 0; scroll-padding-inline: 0; }
+  /* The rails drift continuously, so the card leaving on the left fades out instead of showing a cut sliver. */
+  .rail { -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 120px, #000 calc(100% - 120px), transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 120px, #000 calc(100% - 120px), transparent 100%); }
+
+  /* Photo grids: every card the same small size, last row centred (flex-wrap instead of columns).
+     Cards keep the photo's own 3:2 shape so the whole dish shows, uncropped and centred as shot.
+     No big first card on wide screens (Can, 2026-11-09). */
+  .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gap); }
+  .gcard, .dgrid .gcard, .gcard.wide, .dgrid .gcard.wide {
+    flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols)); height: auto; aspect-ratio: 3 / 2; }
+  .gcard img { object-position: 50% 50% !important; }
+  .gcard.wide .gcard-name { font-size: 12.5px; }
+  /* Breakfast for sharing: the two platters a little bigger (Can, 2026-11-09). */
+  #breakfast .gcard[data-search^="serpme turkish breakfast"],
+  #breakfast .gcard[data-search^="huqqa breakfast platter"] { flex-basis: calc((150% - (var(--cols) - 1.5) * var(--gap)) / var(--cols)); }
+  .drail .gcard { flex: 0 0 26%; aspect-ratio: 3 / 4; }
+  .gbar { flex: 0 0 100%; }
+
+  /* Tea banner: photo beside the title and sizes. */
+  .dhero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+  .dhero-photo::after { display: none; }
+  .dhero-body { align-self: center; padding: 18px 22px; }
+
+  .lightbox img { max-width: min(88vw, 900px); max-height: 78vh; }
+}
+
+@media (min-width: 1024px) {
+  :root { --maxw: 960px; --cols: 4; }
+  .pcard { flex-basis: 31%; }
+  .rail.big .pcard { flex-basis: 36%; }
+  .drail .gcard { flex-basis: 21%; }
+  .scard { flex-basis: 38%; }
+  /* Lists: two columns of rows; a lone last row spans both. */
+  .list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .row, .row + .row { border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin: -1px 0 0 -1px; }
+  .row:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+
+@media (min-width: 1440px) {
+  :root { --maxw: 1200px; --cols: 4; }
+  .pcard { flex-basis: 24%; }
+  .rail.big .pcard { flex-basis: 28%; }
+  .drail .gcard { flex-basis: 17%; }
+  .scard { flex-basis: 30%; }
+}
+
+/* Mouse only: hover states never latch on touch screens. */
+@media (hover: hover) {
+  .pcard, .gcard { transition: border-color 0.25s ease; }
+  .pcard img, .gcard img { transition: transform 0.25s cubic-bezier(0.22, 0.61, 0.36, 1); }
+  button.gcard:hover, .pcard[data-photo]:hover { border-color: var(--gold-line); }
+  button.gcard:hover img, .pcard[data-photo]:hover img { transform: scale(1.04); }
+  .gcard-arrow { transition: background 0.25s ease, color 0.25s ease; }
+  button.gcard:hover .gcard-arrow { background: var(--gold); color: #1c1609; }
+  .row { transition: background 0.25s ease; }
+  .row:hover { background: var(--card-2); }
+  .thumb { transition: border-color 0.25s ease; }
+  button.thumb:hover { border-color: var(--gold-line); }
+  .tab:not([aria-current="true"]):hover { background: var(--card-2); border-color: var(--gold-line); color: var(--gold); }
+  .lang button { transition: color 0.25s ease, background 0.25s ease; }
+  .lang button:not([aria-pressed="true"]):hover { color: var(--text); background: var(--card-2); }
+  .icon-btn { transition: border-color 0.25s ease, color 0.25s ease; }
+  .icon-btn:hover { border-color: var(--gold-line); color: var(--gold); }
+  .burger:hover { border-color: var(--gold-line); }
+  .brand-name { transition: color 0.25s ease; }
+  .brand:hover .brand-name { color: #ecc987; }
+  .brand-btn:not([aria-pressed="true"]):hover, .dchip:not([aria-pressed="true"]):hover { background: rgba(215, 177, 106, 0.2); }
+  button.dtile:not([aria-expanded="true"]):hover { background: #221e17; }
+  .copy-btn:not(.done):hover, .wifi-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .foot-links a { transition: background 0.25s ease, color 0.25s ease; }
+  .foot-links a:hover { background: var(--gold); color: #1c1609; }
+  .to-top:hover { background: var(--gold); color: #1c1609; }
+  .demo-btn:hover { color: var(--text); border-color: var(--gold-line); }
+  .search-clear { transition: color 0.25s ease; }
+  .search-clear:hover { color: var(--text); }
+  .copy-btn, .wifi-btn { transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease; }
+}

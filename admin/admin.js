@@ -10,8 +10,10 @@
 //  - Kitchen sees every section except Hookah (flavors/refills), as the plan says.
 (async function () {
   "use strict";
-  // Mock API with ?mock=1, and always on GitHub Pages (static demo, no server there).
-  const MOCK = /[?&]mock=1\b/.test(location.search) || /\.github\.io$/.test(location.hostname);
+  // Mock API always on GitHub Pages (static demo, no server there); ?mock=1 only on a local dev host,
+  // so the production panel can never show demo accounts/PINs.
+  const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\]|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)$/.test(location.hostname);
+  const MOCK = /\.github\.io$/.test(location.hostname) || (LOCAL && /[?&]mock=1\b/.test(location.search));
   const HERE = (document.currentScript && document.currentScript.src) || location.href;
   if (MOCK) {
     await new Promise((res) => { const s = document.createElement("script"); s.src = new URL("mock-api.js?v=2", HERE).href; s.onload = s.onerror = res; document.head.appendChild(s); });
