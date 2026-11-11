@@ -25,6 +25,9 @@
     backToTop: ["Back to top", "Başa dön"],
     noResults: ["Nothing matches “{q}”.", "“{q}” ile eşleşen ürün yok."],
     thanks: ["Thank you for visiting", "Bizi tercih ettiğiniz için teşekkürler"],
+    brands: ["Brands", "Markalar"],
+    language: ["Language", "Dil"],
+    menuSections: ["Menu sections", "Menü bölümleri"],
     flavorCount: ["flavors", "aroma"],
     served: ["Served", "Servis"],
     hot: ["Hot", "Sıcak"],
@@ -229,7 +232,7 @@
 
   // Brand filter: one brand at a time; tapping the active brand again shows everything.
   let brand = null;
-  const brandButtons = (s) => `<div class="brands" role="group" aria-label="Brands">${s.brandFilter.map((b) =>
+  const brandButtons = (s) => `<div class="brands" role="group" aria-label="${esc(L(UI.brands))}">${s.brandFilter.map((b) =>
     `<button type="button" class="brand-btn" data-brand="${esc(b)}" aria-pressed="false">${esc(b)}</button>`).join("")}</div>`;
   function applyBrand() {
     $$(".brand-btn").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.brand === brand)));
@@ -524,13 +527,10 @@
     const day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(parts.weekday);
     const hour = +parts.hour;
     const inHours = hour >= hh.opens[day] && hour < hh.until;
-    // ?hh=1 / ?hh=0 forces the state, for showing the happy hour look at any time of day.
-    const forced = new URLSearchParams(location.search).get("hh");
-    const live = forced === null ? inHours : forced === "1";
+    const live = inHours;
     document.body.classList.toggle("hh", live);
     const ends = $("#hhEnds");
-    if (live && ends && !inHours) ends.textContent = L(hh.endsAt);
-    else if (live && ends) {
+    if (live && ends) {
       const left = hh.until * 60 - (hour * 60 + +parts.minute);
       const h = Math.floor(left / 60), m = left % 60;
       const t = lang === "tr" ? `${h ? `${h} sa ` : ""}${m} dk` : `${h ? `${h}h ` : ""}${m}m`;
@@ -539,7 +539,7 @@
   }
   // ---- kitchen closing (Virginia time) ------------------------------------
   // In the last 30 minutes before the kitchen closes a strip at the top counts down; after that,
-  // until the lounge closes, it says the kitchen is closed. ?kitchen=soon / ?kitchen=closed forces it.
+  // until the lounge closes, it says the kitchen is closed.
   function updateKitchen() {
     const k = M.info.kitchen, el = $("#kitchen");
     if (!k || !el) return;
@@ -550,9 +550,6 @@
     let mins = +parts.hour * 60 + +parts.minute;
     if (+parts.hour < 6) { day = (day + 6) % 7; mins += 24 * 60; } // after midnight still belongs to the evening before
     const close = k.closes[day] * 60, kitchen = close - 60;
-    const forced = new URLSearchParams(location.search).get("kitchen");
-    if (forced === "soon") mins = kitchen - 25;
-    if (forced === "closed") mins = kitchen + 5;
     const at = (m) => {
       const h = Math.floor(m / 60) % 24;
       return lang === "tr" ? `${String(h).padStart(2, "0")}:00` : `${h % 12 || 12} ${h < 12 ? "AM" : "PM"}`;

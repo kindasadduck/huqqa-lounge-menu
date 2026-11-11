@@ -51,7 +51,7 @@ window.FLAVOR_INFO = {
   "Berlin Nights": { d: ["Sweet peach with refreshing mint.", "Tatlı şeftali ve ferahlatıcı nane."], tags: ["sweet", "fruity", "minty"] },
   "Mi Amor": { d: ["Juicy pineapple and ripe banana with refreshing mint.", "Sulu ananas ve olgun muz, ferahlatıcı naneyle."], tags: ["tropical", "fruity", "minty"] },
   "Ice Lemon Mint": { d: ["Fresh lemon and mint with a strong icy finish.", "Taze limon ve nane, güçlü bir buz serinliğiyle."], tags: ["citrus", "sour", "minty", "icy"] },
-  "Ice Orange": { d: ["Juicy orange with cooling menthol and a frosty finish.", "Sulu portakal, serinletici mentol ve buzlu bir bitişle."], tags: ["citrus", "fruity", "icy"] },
+  "Ice Orange": { d: ["Juicy orange with cooling menthol and a frosty finish.", "Sulu portakal, serinletici mentol ve buzlu bir bitişle."], tags: ["citrus", "fruity", "minty", "icy"] },
   "Ice Blueberry": { d: ["Ripe blueberry with a frosty mint finish.", "Olgun yaban mersini, buz gibi bir nane bitişiyle."], tags: ["berry", "minty", "icy"] },
   "Istanbul Nights": { d: ["Blueberry, raspberry and currant, sweet and tart.", "Yaban mersini, ahududu ve frenk üzümü; tatlı ve mayhoş."], tags: ["berry", "sweet", "sour"] },
   "Lime Spice Peach": { d: ["Tart lime and juicy peach with warm spice.", "Mayhoş misket limonu ve sulu şeftali, sıcak baharatla."], tags: ["citrus", "fruity", "spicy"] },

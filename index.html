@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <!-- ?v= is bumped on every publish so phones fetch the new files instead of a cached copy (Pages caches 10 min). -->
-  <link rel="stylesheet" href="assets/css/style.css?v=2026111009">
+  <link rel="stylesheet" href="assets/css/style.css?v=2026111010">
 </head>
 <body>
   <header class="top" id="top">
@@ -22,7 +22,7 @@
       <div class="top-actions">
         <!-- Demo switch (only with ?demo in the URL): shows sample staff changes, e.g. greyed-out items. -->
         <button type="button" class="demo-btn" id="demoToggle" aria-pressed="false" hidden>Demo</button>
-        <div class="lang" role="group" aria-label="Language">
+        <div class="lang" role="group" aria-label="Language" data-i18n-label="language">
           <button type="button" data-lang="en">EN</button>
           <button type="button" data-lang="tr">TR</button>
         </div>
@@ -42,7 +42,7 @@
       <button type="button" class="specials-tab" id="specialsTab" aria-haspopup="dialog" aria-controls="specialsSheet"></button>
       <a class="tab pinned" id="pinnedTab" href="#hookah" data-target="hookah"></a>
     </div>
-    <nav class="sec-menu" id="secMenu" aria-label="Menu sections" inert></nav>
+    <nav class="sec-menu" id="secMenu" aria-label="Menu sections" data-i18n-label="menuSections" inert></nav>
   </header>
   <div class="sec-scrim" id="secScrim" hidden></div>
 
@@ -60,9 +60,9 @@
     </figure>
   </div>
 
-  <script src="assets/js/menu-data.js?v=2026111009"></script>
-  <script src="assets/js/overlay.js?v=2026111009"></script>
-  <script src="assets/js/flavor-info.js?v=2026111009"></script>
-  <script src="assets/js/app.js?v=2026111009"></script>
+  <script src="assets/js/menu-data.js?v=2026111010"></script>
+  <script src="assets/js/overlay.js?v=2026111010"></script>
+  <script src="assets/js/flavor-info.js?v=2026111010"></script>
+  <script src="assets/js/app.js?v=2026111010"></script>
 </body>
 </html>
