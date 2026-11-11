@@ -486,6 +486,8 @@
 
   function render() {
     if (flavorSheet.open) closeFlavor(true); // language/live overlay refresh: never retain stale details
+    if (specialsModal.sheet.open) specialsModal.close(true);
+    updateSpecialsTab();
     document.documentElement.lang = lang;
     $$("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
     $$("[data-i18n]").forEach((el) => (el.textContent = L(UI[el.dataset.i18n])));
@@ -655,7 +657,7 @@
       io.observe(root);
       const id = setInterval(() => {
         if (reduceMotion.matches || document.hidden || !visible || performance.now() < pausedUntil) return;
-        if (document.body.classList.contains("searching") || flavorSheet.open || !$("#lightbox") || !$("#lightbox").hidden) return;
+        if (document.body.classList.contains("searching") || $("dialog[open]") || !$("#lightbox") || !$("#lightbox").hidden) return;
         d.go(d.cur() + 1);
       }, DECK_MS);
       deckTimers.push({ id, io });
@@ -745,7 +747,7 @@
   function tick(now) {
     const dt = Math.min((now - lastFrame) / 1000, 0.1);
     lastFrame = now;
-    const idle = !reduceMotion.matches && lb.hidden && !flavorSheet.open && !document.body.classList.contains("searching");
+    const idle = !reduceMotion.matches && lb.hidden && !$("dialog[open]") && !document.body.classList.contains("searching");
     for (const r of rails) {
       // Hold still while paused or while a drink's details bar is open under this rail.
       if (!idle || !r.visible || r.touching || now < r.pausedUntil || (openCard && r.el.contains(openCard))) {
@@ -881,26 +883,66 @@
   }
 
   // ---- flavor details: native modal supplies inert background and focus trap ----
-  const flavorSheet = document.createElement("dialog");
-  flavorSheet.id = "flavorSheet";
-  flavorSheet.className = "flavor-sheet";
-  flavorSheet.setAttribute("aria-labelledby", "flavorTitle");
-  document.body.append(flavorSheet);
-  let flavorSource = null, flavorCloseTimer = 0;
-
-  function closeFlavor(instant = false) {
-    clearTimeout(flavorCloseTimer);
-    flavorSheet.classList.remove("open");
-    const finish = () => {
-      if (!flavorSheet.open) return;
-      flavorSheet.close();
-      if (lb.hidden) document.documentElement.classList.remove("locked");
-      if (flavorSource && flavorSource.isConnected) flavorSource.focus({ preventScroll: true });
-      flavorSource = null;
+  function createSheet(id, titleId, extraClass = "") {
+    const sheet = document.createElement("dialog");
+    sheet.id = id;
+    sheet.className = `flavor-sheet ${extraClass}`;
+    sheet.setAttribute("aria-labelledby", titleId);
+    document.body.append(sheet);
+    let source = null, timer = 0, backdrop = false, touch = null;
+    const close = (instant = false) => {
+      clearTimeout(timer);
+      sheet.classList.remove("open");
+      const finish = () => {
+        if (!sheet.open) return;
+        sheet.close();
+        if (lb.hidden && !$("dialog[open]")) document.documentElement.classList.remove("locked");
+        if (source && source.isConnected) source.focus({ preventScroll: true });
+        source = null;
+      };
+      if (instant || reduceMotion.matches) finish();
+      else timer = setTimeout(finish, 280);
     };
-    if (instant || reduceMotion.matches) finish();
-    else flavorCloseTimer = setTimeout(finish, 280);
+    const open = (html, trigger) => {
+      clearTimeout(timer);
+      source = trigger || document.activeElement;
+      sheet.innerHTML = `<div class="flavor-sheet-inner">
+        <div class="flavor-sheet-grip" aria-hidden="true"></div>
+        <button type="button" class="flavor-sheet-close" aria-label="${esc(L(UI.close))}" autofocus><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        ${html}</div>`;
+      if (!sheet.open) sheet.showModal();
+      document.documentElement.classList.add("locked");
+      sheet.getBoundingClientRect();
+      sheet.classList.add("open");
+      $(".flavor-sheet-close", sheet).focus({ preventScroll: true });
+    };
+    sheet.addEventListener("cancel", (e) => { e.preventDefault(); close(); });
+    sheet.addEventListener("keydown", (e) => {
+      if (e.key !== "Tab") return;
+      const controls = $$("button, [href], [tabindex='0']", sheet);
+      const first = controls[0], last = controls[controls.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    sheet.addEventListener("pointerdown", (e) => { backdrop = e.target === sheet; });
+    sheet.addEventListener("click", (e) => {
+      if (e.target.closest(".flavor-sheet-close, [data-sheet-close]") || (e.target === sheet && backdrop)) close();
+      backdrop = false;
+    });
+    sheet.addEventListener("touchstart", (e) => {
+      const p = e.touches[0];
+      touch = p.clientY < sheet.getBoundingClientRect().top + 64 ? { x: p.clientX, y: p.clientY } : null;
+    }, { passive: true });
+    sheet.addEventListener("touchend", (e) => {
+      const p = e.changedTouches[0];
+      if (touch && p.clientY - touch.y > 70 && Math.abs(p.clientX - touch.x) < 60) close();
+      touch = null;
+    }, { passive: true });
+    return { sheet, open, close };
   }
+  const flavorModal = createSheet("flavorSheet", "flavorTitle");
+  const flavorSheet = flavorModal.sheet;
+  const closeFlavor = flavorModal.close;
 
   function openFlavor(trigger) {
     const s = M.sections.find((s) => s.layout === "hookah");
@@ -909,47 +951,76 @@
     const info = window.FLAVOR_INFO && Object.hasOwn(window.FLAVOR_INFO, f) ? window.FLAVOR_INFO[f] : null;
     const tags = info && Array.isArray(info.tags) ? info.tags.filter((tag) => Object.hasOwn(UI.flavorTags, tag)) : [];
     const best = (s.bestsellers || []).includes(f), out = (s.unavailableFlavors || []).includes(f);
-    clearTimeout(flavorCloseTimer);
-    flavorSource = trigger;
-    flavorSheet.innerHTML = `<div class="flavor-sheet-inner">
-      <div class="flavor-sheet-grip" aria-hidden="true"></div>
-      <button type="button" class="flavor-sheet-close" aria-label="${esc(L(UI.close))}" autofocus><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    flavorModal.open(`
       <div class="flavor-sheet-tier">${esc(L(t.title))}</div>
       <h2 id="flavorTitle">${esc(f)}</h2>
       ${best ? `<p class="flavor-sheet-best">${FLAME}${esc(L(UI.bestSeller))}</p>` : ""}
       ${out ? `<p class="flavor-sheet-out">${esc(L(UI.out))}</p>` : ""}
       ${info && Array.isArray(info.d) && L(info.d) ? `<p class="flavor-sheet-desc">${esc(L(info.d))}</p>` : ""}
       ${tags.length ? `<div class="flavor-profile"><h3>${esc(L(UI.tasteProfile))}</h3><ul class="flavor-tags">${tags.map((tag) => `<li>${esc(L(UI.flavorTags[tag]))}</li>`).join("")}</ul></div>` : ""}
-    </div>`;
-    flavorSheet.showModal();
-    document.documentElement.classList.add("locked");
-    flavorSheet.getBoundingClientRect();
-    flavorSheet.classList.add("open");
-    $(".flavor-sheet-close", flavorSheet).focus({ preventScroll: true });
+    `, trigger);
   }
-  flavorSheet.addEventListener("cancel", (e) => { e.preventDefault(); closeFlavor(); });
-  flavorSheet.addEventListener("keydown", (e) => {
-    if (e.key !== "Tab") return;
-    const controls = $$("button, [href], [tabindex='0']", flavorSheet);
-    const first = controls[0], last = controls[controls.length - 1];
-    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-  });
-  let flavorBackdrop = false, flavorTouch = null;
-  flavorSheet.addEventListener("pointerdown", (e) => { flavorBackdrop = e.target === flavorSheet; });
-  flavorSheet.addEventListener("click", (e) => {
-    if (e.target.closest(".flavor-sheet-close") || (e.target === flavorSheet && flavorBackdrop)) closeFlavor();
-    flavorBackdrop = false;
-  });
-  flavorSheet.addEventListener("touchstart", (e) => {
-    const y = e.touches[0].clientY;
-    flavorTouch = y < flavorSheet.getBoundingClientRect().top + 64 ? { x: e.touches[0].clientX, y } : null;
-  }, { passive: true });
-  flavorSheet.addEventListener("touchend", (e) => {
-    const p = e.changedTouches[0];
-    if (flavorTouch && p.clientY - flavorTouch.y > 70 && Math.abs(p.clientX - flavorTouch.x) < 60) closeFlavor();
-    flavorTouch = null;
-  }, { passive: true });
+
+  // ---- daily specials (restaurant business date, not the device timezone) ----
+  const DAYS = [["Sunday", "Pazar"], ["Monday", "Pazartesi"], ["Tuesday", "Salı"], ["Wednesday", "Çarşamba"], ["Thursday", "Perşembe"], ["Friday", "Cuma"], ["Saturday", "Cumartesi"]];
+  const SHORT_DAYS = [["Sun", "Paz"], ["Mon", "Pzt"], ["Tue", "Sal"], ["Wed", "Çar"], ["Thu", "Per"], ["Fri", "Cum"], ["Sat", "Cmt"]];
+  function businessDay() {
+    const host = location.hostname;
+    const local = host === "localhost" || host === "127.0.0.1" || /^10\.(?:\d{1,3}\.){2}\d{1,3}$/.test(host) || /^192\.168\.\d{1,3}\.\d{1,3}$/.test(host) || /^172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}$/.test(host);
+    const override = local && new URLSearchParams(location.search).get("now");
+    const parsed = override ? new Date(override) : null;
+    const now = parsed && Number.isFinite(parsed.getTime()) ? parsed : new Date();
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit", hour: "numeric", hourCycle: "h23",
+    }).formatToParts(now).map((p) => [p.type, p.value]));
+    // Shift the local calendar date, not the instant: safe across DST changes.
+    const date = new Date(Date.UTC(+parts.year, +parts.month - 1, +parts.day - (+parts.hour < 4 ? 1 : 0)));
+    return { key: date.toISOString().slice(0, 10), day: date.getUTCDay() };
+  }
+  const specialsModal = createSheet("specialsSheet", "specialsTitle", "specials-sheet");
+  function specialsState() {
+    const { day, key } = businessDay(), list = M.specials || [];
+    const today = list.find((s) => s.days.includes(day));
+    let lead = today, nextDay = day;
+    for (let delta = 1; !lead && delta <= 7; delta++) {
+      nextDay = (day + delta) % 7;
+      lead = list.find((s) => s.days.includes(nextDay));
+    }
+    return { day, key, list, today, lead, nextDay };
+  }
+  function updateSpecialsTab() {
+    const { today, lead } = specialsState(), button = $("#specialsTab");
+    button.hidden = !lead;
+    button.innerHTML = `<span aria-hidden="true">${ICON.star}</span><span class="specials-tab-label">${esc(L(today ? ["Today", "Bugün"] : ["Specials", "Özeller"]))}</span>`;
+    button.setAttribute("aria-label", L(today ? ["Today's special", "Günün özeli"] : ["Weekly specials", "Haftanın özelleri"]));
+  }
+  function openSpecials() {
+    const { list, today, lead, nextDay } = specialsState();
+    if (!lead) return;
+    const price = (s) => s.price != null && s.price !== "" ? `<span class="specials-price">${esc(s.price)}</span>` : "";
+    const dayLabel = (s) => s.days.length === 1 ? L(SHORT_DAYS[s.days[0]]) : `${L(SHORT_DAYS[s.days[0]])}–${L(SHORT_DAYS[s.days[s.days.length - 1]])}`;
+    specialsModal.open(`
+      <div class="flavor-sheet-tier">${esc(L(today ? ["Today's special", "Günün özeli"] : ["Weekly specials", "Haftanın özelleri"]))}${today ? ` · ${esc(L(DAYS[nextDay]))}` : ""}</div>
+      ${lead.img ? `<img class="specials-photo" src="${img(lead.img, "md")}" srcset="${img(lead.img, "sm")} 320w, ${srcset(lead.img)}" sizes="(min-width: 720px) 414px, calc(100vw - 48px)" alt="${esc(L(lead.name))}">` : `<div class="specials-ornament" aria-hidden="true"><span></span>${ICON.star}<span></span></div>`}
+      ${!today ? `<p class="specials-next">${esc(L(["Next up", "Sıradaki"]))} · ${esc(L(DAYS[nextDay]))}</p>` : ""}
+      <div class="specials-heading"><h2 id="specialsTitle">${esc(L(lead.name))}</h2>${price(lead)}</div>
+      <p class="flavor-sheet-desc specials-desc">${esc(L(lead.desc))}</p>
+      <section class="specials-week" aria-labelledby="specialsWeekTitle">
+        <h3 id="specialsWeekTitle">${esc(L(["This week", "Bu hafta"]))}</h3>
+        <ul>${list.map((s) => `<li><span class="specials-days">${esc(dayLabel(s))}</span><span class="specials-item">${esc(L(s.name))}${today === s ? `<span class="specials-today">${esc(L(["Today", "Bugün"]))}</span>` : ""}${price(s)}</span></li>`).join("")}</ul>
+      </section>
+      <button type="button" class="specials-primary" data-sheet-close>${esc(L(["See the menu", "Menüye geç"]))}</button>
+    `, $("#specialsTab"));
+    try { localStorage.setItem("hq-specials-seen", businessDay().key); } catch (_) {}
+  }
+  let specialsAttempted = false;
+  function autoSpecials() {
+    if (specialsAttempted || location.hash || !specialsState().lead) return;
+    try { if (localStorage.getItem("hq-specials-seen") === businessDay().key) return; } catch (_) {}
+    if ($("dialog[open]") || !lb.hidden || document.body.classList.contains("sec-open") || !$("#searchRow").hidden || document.hidden) return;
+    specialsAttempted = true;
+    openSpecials();
+  }
 
   // ---- search -------------------------------------------------------------
   function applySearch() {
@@ -1006,6 +1077,7 @@
 
   // ---- events -------------------------------------------------------------
   document.addEventListener("click", (e) => {
+    if (e.target.closest("#specialsTab")) { setSecMenu(false); openSpecials(); return; }
     if (e.target.closest("#burger")) { setSecMenu($("#burger").getAttribute("aria-expanded") !== "true"); return; }
     if (e.target.closest("#secScrim")) { setSecMenu(false, true); return; }
     const tab = e.target.closest(".tab, .mlink");
@@ -1083,12 +1155,13 @@
     if (window.scrollY > 0) window.scrollTo({ top: 0 });
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape" || flavorSheet.open) return;
+    if (e.key !== "Escape" || $("dialog[open]")) return;
     if (!lb.hidden) closeLightbox();
     else if (!$("#searchRow").hidden) setSearchOpen(false);
   });
 
   render();
+  setTimeout(autoSpecials, 700);
   requestAnimationFrame((t) => { lastFrame = t; tick(t); });
 
   // ---- live changes from the staff panel ------------------------------------

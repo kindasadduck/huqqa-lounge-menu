@@ -637,3 +637,26 @@ body.searching .deck, body.searching .best-legend, body.searching .rail:not(.dra
   .search-clear:hover { color: var(--text); }
   .copy-btn, .wifi-btn { transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease; }
 }
+
+/* Daily specials: same compact gold pill family as the pinned section. */
+.specials-tab { margin-left: auto; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 14px; border: 1px solid var(--gold-line); border-radius: 999px; background: var(--gold-soft); color: var(--gold); font-size: 13px; font-weight: 600; white-space: nowrap; transition: background 0.25s; }
+.specials-tab > span:first-child { display: flex; }
+.specials-tab svg { width: 16px; height: 16px; }
+.specials-ornament { display: flex; align-items: center; gap: 12px; margin: 26px 0 18px; color: var(--gold); }
+.specials-ornament span { height: 1px; flex: 1; background: var(--gold-line); opacity: 0.5; }
+.specials-ornament svg { width: 18px; height: 18px; }
+.specials-photo { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 14px; margin: 26px 0 18px; }
+.specials-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
+.specials-sheet h2 { font-size: 28px; margin: 0; }
+.specials-price { flex-shrink: 0; color: var(--gold); font-size: 15px; font-weight: 600; }
+.specials-next { color: var(--gold); font-size: 12px; margin: 0 0 8px; }
+.specials-desc { margin-top: 12px; font-size: 14px; }
+.specials-week { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.specials-week ul { list-style: none; margin: 0; padding: 0; }
+.specials-week li { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.specials-days { color: var(--muted); font-size: 12px; }
+.specials-item { display: flex; align-items: baseline; justify-content: flex-end; gap: 8px; flex-wrap: wrap; text-align: right; }
+.specials-today { color: var(--gold); font-size: 10px; font-weight: 600; border: 1px solid var(--gold-line); border-radius: 999px; padding: 2px 6px; }
+.specials-primary { width: 100%; min-height: 48px; margin-top: 24px; border: 1px solid var(--gold); border-radius: 999px; background: var(--gold); color: #1c1609; font-weight: 600; }
+@media (max-width: 379px) { .specials-tab { padding: 0; } .specials-tab-label { display: none; } }
+@media (hover: hover) { .specials-tab:hover { background: #292217; } .specials-primary:hover { background: #e2bf80; } }

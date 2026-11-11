@@ -56,6 +56,14 @@ window.MENU = {
     ["desserts", "Lemon Cheesecake"],
   ],
 
+  // Daily specials: 0 Sun … 6 Sat, America/New_York business day (04:00 cutoff).
+  // img: menu photo slug; null means no photo yet. TODO(Can): prices and final descriptions.
+  specials: [
+    { id: "kokorec", days: [2], name: ["Kokoreç", "Kokoreç"], desc: ["A Turkish street-food classic: seasoned lamb intestines, grilled and chopped with spices.", "Türk sokak lezzetlerinin klasiği: baharatla doğranmış, ızgarada pişmiş kokoreç."], price: null, img: null },
+    { id: "tantuni", days: [4], name: ["Tantuni", "Tantuni"], desc: ["Mersin-style thin-sliced beef sautéed with spices and wrapped in lavash.", "Mersin usulü, baharatla sotelenmiş ince doğranmış et, lavaşa sarılı."], price: null, img: null },
+    { id: "soup", days: [5, 6, 0], name: ["Soup of the week", "Haftanın çorbası"], desc: ["Our special soup, served Friday to Sunday. Ask your server what's in the pot.", "Cuma'dan pazara özel çorbamız. Bugün ne piştiğini garsonumuza sorun."], price: null, img: null },
+  ],
+
   sections: [
     {
       id: "breakfast",
