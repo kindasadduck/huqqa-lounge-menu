@@ -208,8 +208,8 @@ window.MENU = {
       tag: ["Fire-kissed", "Ateşten"],
       carousel: ["Huqqa Mix Kebab", "Adana Kebab", "Chicken Shish Kebab", "Lamb Chops"],
       layout: "grid",
-      note: ["Add-ons: Adana skewer +$12 · chicken (2) +$7 · köfte (2) +$7 · lamb chop +$5",
-             "Ekstralar: Adana şiş +$12 · tavuk (2) +$7 · köfte (2) +$7 · kuzu pirzola +$5"],
+      note: ["Add-ons: Adana skewer +$12 · chicken (2) +$7 · köfte (2) +$7 · lamb chop +$9",
+             "Ekstralar: Adana şiş +$12 · tavuk (2) +$7 · köfte (2) +$7 · kuzu pirzola +$9"],
       groups: [
         {
           items: [
@@ -432,7 +432,7 @@ window.MENU = {
             d(["Turkish Gazoz", "Gazoz"], "$3.90", "turkish-gazoz", { flavors: [["Clear", "Sade"], ["Orange", "Portakal"], ["Lemonade", "Limonata"]] }),
             d(["Can Sodas", "Kutu İçecekler"], "$3.25", "can-sodas"),
             d(["Red Bull", "Red Bull"], "$4.90", "redbull", { flavors: [["Original", "Klasik"], ["Sugar Free", "Şekersiz"]] }),
-            d(["Water", "Su"], "$2.00", null),
+            d(["Water", "Su"], "$2.00", "water"),
           ],
         },
       ],
