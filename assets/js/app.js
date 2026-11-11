@@ -991,7 +991,7 @@
   function updateSpecialsTab() {
     const { today, lead } = specialsState(), button = $("#specialsTab");
     button.hidden = !lead;
-    button.innerHTML = `<span aria-hidden="true">${ICON.star}</span><span class="specials-tab-label">${esc(L(["Daily special", "Günün özeli"]))}</span>`;
+    button.innerHTML = `<span aria-hidden="true">${ICON.star}</span><span class="specials-tab-label">${esc(L(["Daily specials", "Günün özeli"]))}</span>`;
     button.setAttribute("aria-label", L(today ? ["Today's special", "Günün özeli"] : ["Weekly specials", "Haftanın özelleri"]));
   }
   function openSpecials() {
