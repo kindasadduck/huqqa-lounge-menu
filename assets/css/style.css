@@ -343,7 +343,37 @@ body.sec-open .sec-scrim { opacity: 1; pointer-events: auto; }
 .flavors { display: flex; flex-wrap: wrap; gap: 8px; }
 .flavor { padding: 6px 12px; border-radius: 999px; background: var(--card-2); border: 1px solid var(--line); font-size: 13.5px; color: #e3dccf; }
 .flavor.dim, .flavor.off { opacity: 0.3; }
-.flavor { transition: opacity 0.2s; }
+.flavor { transition: opacity 0.2s; text-align: start; }
+/* Native modal keeps the flavor grid untouched and traps focus automatically. */
+.flavor-sheet {
+  position: fixed; inset: auto 0 0; margin: 0 auto; width: min(100%, 560px);
+  max-width: 100%; max-height: calc(100dvh - 32px); padding: 0;
+  border: 1px solid var(--gold-line); border-bottom: 0; border-radius: 24px 24px 0 0;
+  background: var(--card); color: var(--text); overflow: auto; overscroll-behavior: contain;
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.28s ease, transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.flavor-sheet.open { opacity: 1; transform: translateY(0); }
+.flavor-sheet::backdrop { background: rgba(0, 0, 0, 0.72); }
+.flavor-sheet-inner { position: relative; padding: 32px 24px max(32px, env(safe-area-inset-bottom)); }
+.flavor-sheet-grip { position: absolute; top: 10px; left: calc(50% - 18px); width: 36px; height: 3px; border-radius: 3px; background: var(--faint); }
+.flavor-sheet-close { position: absolute; top: 18px; right: 16px; display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 50%; color: var(--muted); }
+.flavor-sheet-tier { padding-right: 44px; color: var(--gold); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+.flavor-sheet h2 { margin: 10px 44px 0 0; font: 600 30px/1.2 var(--serif); overflow-wrap: anywhere; }
+.flavor-sheet-best { display: flex; align-items: center; gap: 6px; margin: 14px 0 0; color: var(--gold); font-size: 12px; }
+.flavor-sheet-out { margin: 14px 0 0; color: var(--muted); font-size: 13px; }
+.flavor-sheet-desc { margin: 22px 0 0; color: #d9d2c4; font-size: 15px; line-height: 1.65; }
+.flavor-sheet h3 { margin: 0 0 10px; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+.flavor-profile { margin-top: 24px; }
+.flavor-tags { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.flavor-tags li { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card-2); font-size: 13px; }
+@media (min-width: 720px) {
+  .flavor-sheet { inset: 0; margin: auto; width: 480px; height: fit-content; border-bottom: 1px solid var(--gold-line); border-radius: 24px; }
+  .flavor-sheet-inner { padding: 36px 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flavor-sheet { transition: none; transform: none; }
+}
 .tier.off .tier-head, .row.off { opacity: 0.35; }
 .brands { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; padding-bottom: 12px; }
 .brand-btn {

@@ -31,6 +31,14 @@
     iced: ["Iced", "Buzlu"],
     size: ["Size", "Boy"],
     flavors: ["Flavors", "Aromalar"],
+    tasteProfile: ["Taste profile", "Tat profili"],
+    flavorTags: {
+      sweet: ["Sweet", "Tatlı"], sour: ["Sour", "Ekşi"], fruity: ["Fruity", "Meyveli"],
+      berry: ["Berry", "Orman meyveli"], citrus: ["Citrus", "Narenciye"], tropical: ["Tropical", "Tropik"],
+      minty: ["Minty", "Naneli"], icy: ["Icy", "Buzlu"], creamy: ["Creamy", "Kremalı"],
+      spicy: ["Spiced", "Baharatlı"], floral: ["Floral", "Çiçeksi"], anise: ["Anise", "Anasonlu"],
+      coffee: ["Coffee", "Kahveli"], dessert: ["Dessert", "Tatlı gibi"], herbal: ["Herbal", "Bitkisel"],
+    },
     tapPreview: ["Tap an option to see it.", "Görmek için bir seçeneğe dokunun."],
     vegetarian: ["Vegetarian", "Vejetaryen"],
     hours: ["Hours", "Çalışma saatleri"],
@@ -144,9 +152,16 @@
     return `<div class="rail ${extraClass}" data-count="${cards.length}">${clones}${cards.join("")}${clones}</div>`;
   };
 
+  // Sliders show their items in a random order, picked once per page load so live
+  // re-renders (staff changes, language switch) keep the same order.
+  const SHUFFLE_SEED = Math.random();
+  const shuffled = (list) => list
+    .map((f) => [f, f ? [...`${SHUFFLE_SEED}|${f[0].name[0]}`].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619), 2166136261) : 0])
+    .sort((a, b) => a[1] - b[1]).map(([f]) => f);
+
   const carousel = (s) => {
     if (!s.carousel && !s.carouselKeys) return "";
-    const found = s.carouselKeys ? s.carouselKeys.map((k) => window.HQ.findByKey(M, k)) : s.carousel.map((name) => findItem(s.id, name));
+    const found = shuffled(s.carouselKeys ? s.carouselKeys.map((k) => window.HQ.findByKey(M, k)) : s.carousel.map((name) => findItem(s.id, name)));
     const cards = found.filter((f) => f && f[0].img).map((f) => photoCard(f[0]));
     if (!cards.length) return "";
     return `<h3 class="sub">${esc(L(UI.bestSellers))}</h3>${rail(cards)}
@@ -256,7 +271,7 @@
   const flavorChip = (s, t, f) => {
     const best = (s.bestsellers || []).includes(f);
     const out = (s.unavailableFlavors || []).includes(f);
-    return `<span class="flavor${best ? " best" : ""}${out ? " out" : ""}" data-search="${esc(fold(f))}" data-brands="${esc(brandOf(t, f))}">${best ? FLAME : ""}${esc(f)}${best ? `<span class="sr">, ${esc(L(UI.bestSeller))}</span>` : ""}${out ? `<span class="sr">, ${esc(L(UI.out))}</span>` : ""}</span>`;
+    return `<button type="button" class="flavor${best ? " best" : ""}${out ? " out" : ""}" data-flavor="${esc(f)}" data-tier="${s.tiers.indexOf(t)}" aria-haspopup="dialog" aria-controls="flavorSheet" data-search="${esc(fold(f))}" data-brands="${esc(brandOf(t, f))}">${best ? FLAME : ""}${esc(f)}${best ? `<span class="sr">, ${esc(L(UI.bestSeller))}</span>` : ""}${out ? `<span class="sr">, ${esc(L(UI.out))}</span>` : ""}</button>`;
   };
   const bestLegend = (s) => ((s.bestsellers || []).length ? `<p class="best-legend">${FLAME}<span>${esc(L(UI.bestLegend))}</span></p>` : "");
 
@@ -417,7 +432,7 @@
   };
 
   const featured = () => {
-    const found = M.featuredKeys ? M.featuredKeys.map((k) => window.HQ.findByKey(M, k)) : M.featured.map(([sid, name]) => findItem(sid, name));
+    const found = shuffled(M.featuredKeys ? M.featuredKeys.map((k) => window.HQ.findByKey(M, k)) : M.featured.map(([sid, name]) => findItem(sid, name)));
     const cards = found.filter((f) => f && f[0].img)
       .map(([it, s]) => photoCard(it, L(s.tabTitle || s.title), "450px"));
     return `
@@ -470,6 +485,7 @@
     .map((t) => `<a class="mlink${t.id === "featured" ? " wide" : ""}" href="#${t.id}" data-target="${t.id}"><span>${esc(t.label)}</span>${CHECK}</a>`).join("");
 
   function render() {
+    if (flavorSheet.open) closeFlavor(true); // language/live overlay refresh: never retain stale details
     document.documentElement.lang = lang;
     $$("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
     $$("[data-i18n]").forEach((el) => (el.textContent = L(UI[el.dataset.i18n])));
@@ -639,7 +655,7 @@
       io.observe(root);
       const id = setInterval(() => {
         if (reduceMotion.matches || document.hidden || !visible || performance.now() < pausedUntil) return;
-        if (document.body.classList.contains("searching") || !$("#lightbox") || !$("#lightbox").hidden) return;
+        if (document.body.classList.contains("searching") || flavorSheet.open || !$("#lightbox") || !$("#lightbox").hidden) return;
         d.go(d.cur() + 1);
       }, DECK_MS);
       deckTimers.push({ id, io });
@@ -729,7 +745,7 @@
   function tick(now) {
     const dt = Math.min((now - lastFrame) / 1000, 0.1);
     lastFrame = now;
-    const idle = !reduceMotion.matches && lb.hidden && !document.body.classList.contains("searching");
+    const idle = !reduceMotion.matches && lb.hidden && !flavorSheet.open && !document.body.classList.contains("searching");
     for (const r of rails) {
       // Hold still while paused or while a drink's details bar is open under this rail.
       if (!idle || !r.visible || r.touching || now < r.pausedUntil || (openCard && r.el.contains(openCard))) {
@@ -864,6 +880,77 @@
     }, 280);
   }
 
+  // ---- flavor details: native modal supplies inert background and focus trap ----
+  const flavorSheet = document.createElement("dialog");
+  flavorSheet.id = "flavorSheet";
+  flavorSheet.className = "flavor-sheet";
+  flavorSheet.setAttribute("aria-labelledby", "flavorTitle");
+  document.body.append(flavorSheet);
+  let flavorSource = null, flavorCloseTimer = 0;
+
+  function closeFlavor(instant = false) {
+    clearTimeout(flavorCloseTimer);
+    flavorSheet.classList.remove("open");
+    const finish = () => {
+      if (!flavorSheet.open) return;
+      flavorSheet.close();
+      if (lb.hidden) document.documentElement.classList.remove("locked");
+      if (flavorSource && flavorSource.isConnected) flavorSource.focus({ preventScroll: true });
+      flavorSource = null;
+    };
+    if (instant || reduceMotion.matches) finish();
+    else flavorCloseTimer = setTimeout(finish, 280);
+  }
+
+  function openFlavor(trigger) {
+    const s = M.sections.find((s) => s.layout === "hookah");
+    const t = s && s.tiers[Number(trigger.dataset.tier)], f = trigger.dataset.flavor;
+    if (!t || !t.flavors.includes(f)) return;
+    const info = window.FLAVOR_INFO && Object.hasOwn(window.FLAVOR_INFO, f) ? window.FLAVOR_INFO[f] : null;
+    const tags = info && Array.isArray(info.tags) ? info.tags.filter((tag) => Object.hasOwn(UI.flavorTags, tag)) : [];
+    const best = (s.bestsellers || []).includes(f), out = (s.unavailableFlavors || []).includes(f);
+    clearTimeout(flavorCloseTimer);
+    flavorSource = trigger;
+    flavorSheet.innerHTML = `<div class="flavor-sheet-inner">
+      <div class="flavor-sheet-grip" aria-hidden="true"></div>
+      <button type="button" class="flavor-sheet-close" aria-label="${esc(L(UI.close))}" autofocus><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <div class="flavor-sheet-tier">${esc(L(t.title))}</div>
+      <h2 id="flavorTitle">${esc(f)}</h2>
+      ${best ? `<p class="flavor-sheet-best">${FLAME}${esc(L(UI.bestSeller))}</p>` : ""}
+      ${out ? `<p class="flavor-sheet-out">${esc(L(UI.out))}</p>` : ""}
+      ${info && Array.isArray(info.d) && L(info.d) ? `<p class="flavor-sheet-desc">${esc(L(info.d))}</p>` : ""}
+      ${tags.length ? `<div class="flavor-profile"><h3>${esc(L(UI.tasteProfile))}</h3><ul class="flavor-tags">${tags.map((tag) => `<li>${esc(L(UI.flavorTags[tag]))}</li>`).join("")}</ul></div>` : ""}
+    </div>`;
+    flavorSheet.showModal();
+    document.documentElement.classList.add("locked");
+    flavorSheet.getBoundingClientRect();
+    flavorSheet.classList.add("open");
+    $(".flavor-sheet-close", flavorSheet).focus({ preventScroll: true });
+  }
+  flavorSheet.addEventListener("cancel", (e) => { e.preventDefault(); closeFlavor(); });
+  flavorSheet.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab") return;
+    const controls = $$("button, [href], [tabindex='0']", flavorSheet);
+    const first = controls[0], last = controls[controls.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+  let flavorBackdrop = false, flavorTouch = null;
+  flavorSheet.addEventListener("pointerdown", (e) => { flavorBackdrop = e.target === flavorSheet; });
+  flavorSheet.addEventListener("click", (e) => {
+    if (e.target.closest(".flavor-sheet-close") || (e.target === flavorSheet && flavorBackdrop)) closeFlavor();
+    flavorBackdrop = false;
+  });
+  flavorSheet.addEventListener("touchstart", (e) => {
+    const y = e.touches[0].clientY;
+    flavorTouch = y < flavorSheet.getBoundingClientRect().top + 64 ? { x: e.touches[0].clientX, y } : null;
+  }, { passive: true });
+  flavorSheet.addEventListener("touchend", (e) => {
+    const p = e.changedTouches[0];
+    if (flavorTouch && p.clientY - flavorTouch.y > 70 && Math.abs(p.clientX - flavorTouch.x) < 60) closeFlavor();
+    flavorTouch = null;
+  }, { passive: true });
+
   // ---- search -------------------------------------------------------------
   function applySearch() {
     const q = fold($("#searchInput").value.trim());
@@ -926,6 +1013,9 @@
 
     const dir = e.target.closest(".deck .round");
     if (dir) { const d = deckOf(dir); d.go(d.cur() + +dir.dataset.dir); return; }
+
+    const flavor = e.target.closest("button[data-flavor]");
+    if (flavor) { openFlavor(flavor); return; }
 
     const photo = e.target.closest("[data-photo]");
     if (photo) {
@@ -993,7 +1083,7 @@
     if (window.scrollY > 0) window.scrollTo({ top: 0 });
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape") return;
+    if (e.key !== "Escape" || flavorSheet.open) return;
     if (!lb.hidden) closeLightbox();
     else if (!$("#searchRow").hidden) setSearchOpen(false);
   });

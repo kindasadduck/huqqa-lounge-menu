@@ -47,13 +47,13 @@ window.MENU = {
   // Featured tab: references items by section id + item name (English).
   featured: [
     ["grill", "Huqqa Mix Kebab"],
+    ["grill", "Chicken and Köfte Mix"],
     ["sandwiches", "Adana Wrap"],
-    ["grill", "Chicken Shish Kebab"],
     ["oven", "Lahmacun"],
-    ["breakfast", "Serpme Turkish Breakfast"],
+    ["desserts", "Rice Pudding"],
     ["desserts", "Künefe"],
-    ["grill", "Adana Kebab"],
-    ["appetizers", "Hummus"],
+    ["drinks", "Pome Coco"],
+    ["desserts", "Lemon Cheesecake"],
   ],
 
   sections: [
@@ -165,7 +165,7 @@ window.MENU = {
       title: ["Sandwiches and Burgers", "Sandviç ve Burger"],
       tabTitle: ["Sandwiches", "Sandviçler"],
       tag: ["Crafted to perfection", "Özenle hazırlanır"],
-      carousel: ["Adana Wrap", "Huqqa Special Burger", "Kumru"],
+      carousel: ["Adana Wrap", "Huqqa Special Burger", "Chicken Sandwich", "Mixed Sucuk Tost"],
       layout: "grid",
       groups: [
         {
@@ -206,7 +206,7 @@ window.MENU = {
       id: "grill",
       title: ["Grill", "Izgara"],
       tag: ["Fire-kissed", "Ateşten"],
-      carousel: ["Huqqa Mix Kebab", "Adana Kebab", "Chicken Shish Kebab", "Lamb Chops"],
+      carousel: ["Huqqa Mix Kebab", "Chicken and Köfte Mix", "Liver Shish Kebab", "Lamb Chops"],
       layout: "grid",
       note: ["Add-ons: Adana skewer +$12 · chicken (2) +$7 · köfte (2) +$7 · lamb chop +$9",
              "Ekstralar: Adana şiş +$12 · tavuk (2) +$7 · köfte (2) +$7 · kuzu pirzola +$9"],
@@ -268,7 +268,7 @@ window.MENU = {
       tag: ["Pide, lahmacun and pizza", "Pide, lahmacun ve pizza"],
       // Shown as a gold badge beside the title instead of the tag.
       badge: ["Available after 7 PM", "19:00'dan sonra"],
-      carousel: ["Lahmacun", "Huqqa Mixed Pizza", "Steak and Cheese Stuffed Pide"],
+      carousel: ["Lahmacun", "Diced Beef and Cheese Pide", "Huqqa Mixed Pizza"],
       layout: "grid",
       groups: [
         {
@@ -297,7 +297,7 @@ window.MENU = {
       id: "desserts",
       title: ["Desserts", "Tatlılar"],
       tag: ["Sweet", "Tatlı kaçamak"],
-      carousel: ["Künefe", "Baklava", "Katmer with Ice Cream"],
+      carousel: ["Künefe", "Rice Pudding", "Kazandibi", "Chocolate Crumb Dome", "Lemon Cheesecake", "Tres Leches"],
       layout: "grid",
       groups: [
         {
@@ -332,7 +332,7 @@ window.MENU = {
             i(["Chocolate Cream Cup", "Çikolatalı Krema Kup"], "$12.00", "chocolate-cream-cup", ["Layers of cream and chocolate sauce, served in a cup.", "Krema ve çikolata sosu katları, kupta servis edilir."]),
             i(["Cream Crumb Cake", "Kırıntılı Kremalı Pasta"], "$12.00", "cream-crumb-cake", ["Cream layers with cocoa sponge, biscuit crumb on top.", "Kakaolu kek katları arasında krema, üstü bisküvi kırıntılı."]),
             i(["Berry Mousse Cake", "Meyveli Mus Pasta"], "$12.00", "berry-mousse-cake", ["Berry mousse with a berry glaze top on a biscuit base.", "Bisküvi tabanlı meyve musu, üstü meyveli jöle."]),
-            i(["Mango Cheesecake", "Mangolu Cheesecake"], "$12.00", "mango-cheesecake", ["Creamy cheesecake with a golden fruit glaze on a biscuit base.", "Bisküvi tabanlı kremalı cheesecake, üstü altın rengi meyve jölesi."]),
+            i(["Lemon Cheesecake", "Limonlu Cheesecake"], "$12.00", "mango-cheesecake", ["Creamy cheesecake with a lemon glaze on a biscuit base.", "Bisküvi tabanlı kremalı cheesecake, üstü limon sosu."]),
           ],
         },
       ],
@@ -494,7 +494,7 @@ window.MENU = {
       // (a mix when it has several flavors); the first is the headline, the rest show as "Also loves".
       // An optional note shows under the mix.
       // Best-selling flavors (placeholder until Can sends the real list); they get a flame in the flavor lists.
-      bestsellers: ["Mango", "Double Apple", "Baku Nights", "Ice Lemon Mint"],
+      bestsellers: ["Lemon Mint", "Mango", "Orange Mint", "Gum Mint", "Baku Nights", "Lady Killer", "Ice Lemon Mint", "Marbella"],
       staffPicks: [
         { name: "Wafaa", title: ["Wafaa's pick", "Wafaa'nın seçimi"], picks: [["Ice Lemon Mint", "Mango"], ["Marbella"]] },
         { name: "Esma", title: ["Esma's pick", "Esma'nın seçimi"], picks: [["Lime Spice Peach", "Mi Amor"]] },
