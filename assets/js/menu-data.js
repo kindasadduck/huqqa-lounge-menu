@@ -60,7 +60,7 @@ window.MENU = {
   // img: menu photo slug; null means no photo yet. TODO(Can): prices and final descriptions.
   specials: [
     { id: "kokorec", days: [2], name: ["Kokoreç", "Kokoreç"], desc: ["A Turkish street-food classic: seasoned lamb intestines, grilled and chopped with spices.", "Türk sokak lezzetlerinin klasiği: baharatla doğranmış, ızgarada pişmiş kokoreç."], price: null, img: null },
-    { id: "tantuni", days: [4], name: ["Tantuni", "Tantuni"], desc: ["Mersin-style thin-sliced beef sautéed with spices and wrapped in lavash.", "Mersin usulü, baharatla sotelenmiş ince doğranmış dana eti, lavaşa sarılı."], price: null, img: null },
+    { id: "tantuni", days: [4], name: ["Tantuni", "Tantuni"], desc: ["Istanbul-Izmir-style thin-sliced beef sautéed with spices and wrapped in lavash.", "İstanbul-İzmir usulü, baharatla sotelenmiş ince doğranmış dana eti, lavaşa sarılı."], price: null, img: null },
     { id: "soup", days: [5, 6, 0], name: ["Soup of the week", "Haftanın çorbası"], desc: ["Our special soup, served Friday to Sunday. Ask your server what's in the pot.", "Cumadan pazara özel çorbamız. Bugün ne piştiğini garsonumuza sorun."], price: null, img: null },
   ],
 
