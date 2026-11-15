@@ -331,7 +331,7 @@ window.MENU = {
             i(["Cheesecake", "Cheesecake"], "$8.99", "cheesecake", ["Classic creamy cheesecake.", "Klasik kremalı cheesecake."]),
             i(["Chocolate Layer Cake", "Çikolatalı Pasta"], "$10.00", "chocolate-layer-cake", ["Moist chocolate sponge layers with chocolate cream and glossy chocolate ganache.", "Nemli çikolatalı kek katları, çikolata kreması ve parlak çikolata ganajıyla."]),
             i(["Red Velvet Cake", "Red Velvet Pasta"], "$10.00", "red-velvet-cake", ["Red sponge layers with light cream, piped cream and red sauce.", "Kırmızı kek katları, hafif krema, sıkma krema ve kırmızı sos ile."]),
-            i(["Cocoa Cream Cake", "Kakaolu Kremalı Pasta"], "$12.00", "cocoa-cream-cake", ["Cocoa-dusted sponge layers with light cream.", "Kakao serpilmiş kek katları ve hafif krema."]),
+            i(["Tiramisu", "Tiramisu"], "$12.00", "cocoa-cream-cake", ["Cocoa-dusted sponge layers with light cream.", "Kakao serpilmiş kek katları ve hafif krema."]),
             i(["Rainbow Cake", "Gökkuşağı Pastası"], "$12.00", "rainbow-cake", ["Four colorful sponge layers with thin cream and red crumbs on top.", "İnce kremalı dört renkli kek katı, üstünde kırmızı kırıntılar."]),
             i(["Chocolate Berry Cake", "Meyveli Çikolatalı Pasta"], "$12.00", "chocolate-berry-cake", ["Chocolate cake covered in chocolate shavings with red berry pieces on top.", "Çikolata talaşlı çikolatalı kek, üstünde kırmızı meyve parçaları."]),
             i(["Pistachio Pudding Cake", "Fıstıklı Puding Pasta"], "$12.00", "pistachio-chocolate-cake", ["Biscuit base, chocolate layer and pistachio pudding, topped with ground pistachio.", "Bisküvi taban, çikolata katı ve fıstıklı puding, üstü toz fıstıklı."]),
