@@ -11,6 +11,7 @@ window.FLAVOR_INFO = {
   "Grape": { d: ["A blend of mixed grapes.", "Farklı üzümlerin karışımı."], tags: ["fruity"] },
   "Grape Mint": { d: ["Grape with a cool menthol finish.", "Üzüm, serin bir mentol bitişiyle."], tags: ["fruity", "minty"] },
   "Grapefruit Mint": { d: ["Fresh grapefruit citrus with cool mint notes.", "Taze greyfurt, serin nane notalarıyla."], tags: ["citrus", "minty"] },
+  "Lemon": { d: ["Zesty, aromatic lemon with a lingering aftertaste.", "Canlı ve aromatik limon, damakta kalan bir tatla."], tags: ["citrus"] },
   "Lemon Mint": { d: ["Citrusy lemon with cooling mint notes.", "Narenciye tadında limon, serinletici nane notalarıyla."], tags: ["citrus", "minty"] },
   "Citrus Mint": { d: ["Zesty citrus with cool mint notes.", "Canlı narenciye, serin nane notalarıyla."], tags: ["citrus", "minty"] },
   "Watermelon": { d: ["Fresh watermelon with a sweet finish.", "Taze karpuz, tatlı bir bitişle."], tags: ["sweet", "fruity"] },

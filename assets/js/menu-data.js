@@ -475,7 +475,7 @@ window.MENU = {
           hhDiscount: 6,
           brand: "Al Fakher",
           flavors: ["Double Apple", "Double Apple Mint", "Mint", "Orange", "Orange Mint", "Gum Mint", "Grape", "Grape Mint",
-            "Grapefruit Mint", "Lemon Mint", "Citrus Mint", "Watermelon", "Watermelon Mint", "Gum and Cinnamon",
+            "Grapefruit Mint", "Lemon", "Lemon Mint", "Citrus Mint", "Watermelon", "Watermelon Mint", "Gum and Cinnamon",
             "Blueberry Mint", "Peach", "Peach Mint", "Cappuccino", "Berry Mix", "Rose", "Mango", "Pineapple", "Cherry Mint",
             "Kiwi", "Guava", "Melon", "Vanilla", "Wild Berry Mint", "Mint Cream", "Chewing Gum"],
         },
@@ -506,7 +506,7 @@ window.MENU = {
       // Best-selling flavors (placeholder until Can sends the real list); they get a flame in the flavor lists.
       bestsellers: ["Lemon Mint", "Mango", "Orange Mint", "Gum Mint", "Baku Nights", "Lady Killer", "Ice Lemon Mint", "Marbella"],
       staffPicks: [
-        { name: "Wafaa", title: ["Wafaa's pick", "Wafaa'nın seçimi"], picks: [["Ice Lemon Mint", "Mango"], ["Marbella"]] },
+        { name: "Wafaa", title: ["Wafaa's pick", "Wafaa'nın seçimi"], picks: [["Ice Lemon Mint", "Mango"]] },
         { name: "Esma", title: ["Esma's pick", "Esma'nın seçimi"], picks: [["Lime Spice Peach", "Mi Amor", "Blue Mist"]] },
         { name: "Can", title: ["Can's pick", "Can'ın seçimi"], picks: [["Gum Mastic", "Lemon"]] },
         { name: "Eylül", title: ["Eylül's pick", "Eylül'ün seçimi"], picks: [["Baku Nights", "Safari Melon Dew"]],
