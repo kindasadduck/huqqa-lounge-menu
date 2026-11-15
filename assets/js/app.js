@@ -46,7 +46,7 @@
     vegetarian: ["Vegetarian", "Vejetaryen"],
     hours: ["Hours", "Çalışma saatleri"],
     staffPicks: ["Staff picks", "Ekibimizin favorileri"],
-    alsoLoves: ["Also loves", "Ayrıca sever:"],
+    alsoLoves: ["Also try", "Bunu da deneyin:"],
     classic: ["Classic", "Klasik"],
     premium: ["Premium", "Premium"],
     rateUs: ["Rate us on Google", "Google'da değerlendirin"],
@@ -239,14 +239,14 @@
     $$("[data-brands]").forEach((el) => el.classList.toggle("off", !!brand && !el.dataset.brands.split("|").includes(brand)));
   }
 
-  // Staff picks: one card per server. A bowl with any premium flavor is priced as premium.
+  // Staff picks: one card per mix, no staff names on the menu (p.name/p.title stay as the panel's keys).
+  // A bowl with any premium flavor is priced as premium.
   const staffCard = (s, p) => {
     const [main, ...more] = p.picks;
     const tier = main.some((f) => !s.tiers[0].flavors.includes(f)) ? 1 : 0;
     const t = s.tiers[tier];
-    const words = [p.name, ...p.picks.flat()];
+    const words = p.picks.flat();
     return `<div class="scard" data-search="${esc(fold(words.join(" ")))}">
-      <div class="scard-head"><span class="scard-av" aria-hidden="true">${esc(p.name[0])}</span>${esc(L(p.title))}</div>
       <div class="scard-mix">${main.map((f) => `<span>${esc(f)}</span>`).join('<span class="scard-plus" aria-hidden="true">+</span>')}</div>
       ${p.note ? `<div class="scard-also">${esc(L(p.note))}</div>` : ""}
       ${more.length ? `<div class="scard-also">${esc(L(UI.alsoLoves))} ${more.map((m) => esc(m.join(" + "))).join(", ")}</div>` : ""}

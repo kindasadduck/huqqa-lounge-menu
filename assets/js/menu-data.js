@@ -488,7 +488,9 @@ window.MENU = {
             "Safari Melon Dew", "Irish Peach", "Sex on the Beach", "White Peach", "Queen of Sex",
             "Skyfall", "Love 66", "Lady Killer", "Baku Nights", "Berlin Nights", "Mi Amor",
             "Ice Lemon Mint", "Ice Orange", "Ice Blueberry", "Istanbul Nights", "Lime Spice Peach", "Toasted Berry", "Marbella",
-            "Pan"],
+            "Pan",
+            // TODO(Can): brand not given yet, so it sits in no brandOf list (greyed out when a brand filter is on).
+            "Gum Mastic"],
           brandOf: {
             Starbuzz: ["Blue Mist", "Blue Mist Mint", "Pink", "Tropicool", "Tropicool Mint", "Code 69", "Melon Blue",
               "Safari Melon Dew", "Irish Peach", "Sex on the Beach", "White Peach", "Queen of Sex"],
@@ -505,8 +507,8 @@ window.MENU = {
       bestsellers: ["Lemon Mint", "Mango", "Orange Mint", "Gum Mint", "Baku Nights", "Lady Killer", "Ice Lemon Mint", "Marbella"],
       staffPicks: [
         { name: "Wafaa", title: ["Wafaa's pick", "Wafaa'nın seçimi"], picks: [["Ice Lemon Mint", "Mango"], ["Marbella"]] },
-        { name: "Esma", title: ["Esma's pick", "Esma'nın seçimi"], picks: [["Lime Spice Peach", "Mi Amor"]] },
-        { name: "Can", title: ["Can's pick", "Can'ın seçimi"], picks: [["Istanbul Nights"]] },
+        { name: "Esma", title: ["Esma's pick", "Esma'nın seçimi"], picks: [["Lime Spice Peach", "Mi Amor", "Blue Mist"]] },
+        { name: "Can", title: ["Can's pick", "Can'ın seçimi"], picks: [["Gum Mastic", "Lemon"]] },
         { name: "Eylül", title: ["Eylül's pick", "Eylül'ün seçimi"], picks: [["Baku Nights", "Safari Melon Dew"]],
           note: ["Our first mix to become a hit. Everyone fell for it.", "Dükkânın ilk patlayan karışımı; herkes çok sevdi."] },
         { name: "Deniz", title: ["Deniz's pick", "Deniz'in seçimi"], picks: [["Baku Nights", "Skyfall"]] },
