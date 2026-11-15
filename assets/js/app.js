@@ -45,7 +45,7 @@
     tapPreview: ["Tap an option to see it.", "Görmek için bir seçeneğe dokunun."],
     vegetarian: ["Vegetarian", "Vejetaryen"],
     hours: ["Hours", "Çalışma saatleri"],
-    staffPicks: ["Staff picks", "Ekibimizin favorileri"],
+    staffPicks: ["Signature Mixes", "İmza Karışımlarımız"],
     alsoLoves: ["Also try", "Bunu da deneyin:"],
     classic: ["Classic", "Klasik"],
     premium: ["Premium", "Premium"],
