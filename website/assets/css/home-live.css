@@ -1,0 +1,77 @@
+/* Home live details only. Grid composition remains in site.css. */
+.d-home .d-flavors .d-flavor-slots{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));flex:1 1 auto;min-height:0;gap:6px;list-style:none;margin:0;padding:0}
+.d-home .d-flavors .d-flavor-slot{display:flex;flex-direction:column;justify-content:center;min-width:0;min-height:0;overflow:hidden}
+.d-home .d-flavors .d-flavor-window{position:relative;width:100%;min-width:0;min-height:1.4em;font:600 clamp(1rem,1.55vw,1.5rem)/1.4 var(--serif)}
+/* Each row has three anchors, but only one word; long names borrow empty cells. */
+.d-home .d-flavors .d-flavor-word{position:absolute;top:0;left:0;width:max-content;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:pre;line-height:1.4}
+.d-home .d-flavors .d-flavor-word[data-column="1"]{left:50%;transform:translateX(-50%);text-align:center}
+.d-home .d-flavors .d-flavor-word[data-column="2"]{left:auto;right:0;text-align:right}
+/* Flavor names only, without brand captions. */
+.d-home .d-flavors>.d-title,.d-home .d-flavors .d-flavor-actions{flex:none}
+.d-home .d-flavors .d-flavor-actions{flex-wrap:wrap;gap:4px 10px}
+.d-home .d-flavors .d-flavor-actions [hidden]{display:none}
+.d-home .d-hours .d-status-dot{position:relative;display:inline-block;width:9px;height:9px;min-width:9px;border-radius:50%;background:var(--status-color,var(--muted));color:var(--status-color,var(--muted));vertical-align:middle;box-shadow:none;animation:none;flex:none}
+.d-home .d-hours .d-status-dot::after{content:"";position:absolute;inset:-1px;border:1px solid currentColor;border-radius:inherit;opacity:0}
+.d-home .d-hours[data-state="open"]{--status-color:#4cc38a}
+.d-home .d-hours[data-state="closing-soon"]{--status-color:#e8b84a}
+.d-home .d-hours[data-state="closed"]{--status-color:#e5534b}
+@media(prefers-reduced-motion:no-preference){
+ .d-home .d-flavors .d-flavor-letter{transition:transform .205s var(--ease),opacity .205s var(--ease)}
+ .d-home .d-flavors .d-flavor-word.is-leaving .d-flavor-letter{transform:translateY(-115%);opacity:0}
+ .d-home .d-flavors .d-flavor-word.is-entering .d-flavor-letter{transform:translateY(115%);opacity:0}
+ .d-home .d-flavors .d-flavor-letter:nth-child(3n+2){transition-delay:35ms}
+ .d-home .d-flavors .d-flavor-letter:nth-child(3n){transition-delay:70ms}
+ .d-home .d-hours:is([data-state="open"],[data-state="closing-soon"]) .d-status-dot::after{animation:d-live-pulse 1.8s ease-out infinite}
+}
+@keyframes d-live-pulse{0%{transform:scale(1);opacity:.45}100%{transform:scale(2.6);opacity:0}}
+/* One main event, with full names and no fitted or clipped fight list. */
+.d-home .d-events>*{flex:none}
+.d-home .d-events:has(.d-event-next:not([hidden]))>p{display:none}
+.d-home .d-events .d-event-next{gap:6px}
+.d-home .d-fight-main{margin:0;font:600 1.75rem/1.25 var(--serif);color:var(--gold-hi);text-wrap:balance;overflow-wrap:break-word}
+.d-home .d-event-weight{font-size:.75rem;color:var(--muted)}
+.d-home .d-event-meta{display:grid;gap:4px;color:var(--muted)}
+.d-home .d-hours-schedule{display:flex;flex-direction:column;gap:8px;min-width:0}
+.d-home .d-hours-schedule .d-hours-table{margin:0}
+.d-home .d-hours-schedule .d-note{margin:0}
+.d-home .d-map-pin::after{content:"";position:absolute;inset:1px 3px 9px;border-radius:50%;pointer-events:none}
+@media(min-width:1024px) and (min-height:760px){
+ .d-home .d-bento>.d-events{justify-content:space-between;gap:8px}
+ .d-home .d-events .d-event-next{gap:5px}
+ .d-home .d-events .d-ufc{font-size:2rem}
+ .d-home .d-fight-main{font-size:clamp(1.25rem,1.5vw,1.75rem)}
+ .d-home .d-event-weight,.d-home .d-event-meta,.d-home .d-event-meta a{font-size:.6875rem}
+ .d-home .d-hours{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-rows:auto minmax(0,1fr);align-items:center;column-gap:18px}
+ .d-home .d-hours .d-status-copy{align-self:center;gap:6px}
+ .d-home .d-hours .d-status-title{font-size:1.375rem;line-height:1.2}
+ .d-home .d-hours .d-status-sub{font-size:.6875rem;line-height:1.5}
+ .d-home .d-hours-schedule{grid-column:2;grid-row:2}
+ .d-home .d-hours .d-hours-table{font-size:.875rem;line-height:1.35}
+ .d-home .d-hours-table th,.d-home .d-hours-table td{padding:5px 0;vertical-align:middle}
+ .d-home .d-hours .d-note{font-size:.6875rem;line-height:1.4}
+}
+@media(prefers-reduced-motion:no-preference){
+ .d-home .d-map-pin::after{animation:d-map-pulse 1.8s ease-out infinite}
+}
+@keyframes d-map-pulse{0%{box-shadow:0 0 0 0 rgba(215,177,106,.6)}100%{box-shadow:0 0 0 10px rgba(215,177,106,0)}}
+.d-home .d-image-clip{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none}
+.d-home .d-image-clip>img{width:100%;height:100%;object-fit:cover}
+.d-home .d-map>.d-image-clip{z-index:-2}
+/* Lift cards without changing the grid or intercepting their inner links. */
+@media(hover:hover) and (pointer:fine){
+ .d-home .d-bento>.d-card{transition:transform .25s ease-out,box-shadow .25s ease-out,background-color .25s ease-out,border-color .25s ease-out}
+ .d-home .d-bento>.d-card:hover{transform:translateY(-3px) scale(1.015);z-index:3;box-shadow:0 14px 32px rgba(0,0,0,.45),0 0 0 1px rgba(215,177,106,.35),inset 0 0 22px rgba(215,177,106,.035)}
+ .d-home .d-bento>.d-menu:hover{transform:translateY(-3px) scale(1.006)}
+ .d-home .d-bento>.d-card img{transition:scale .25s ease-out}
+ .d-home .d-photo:hover .d-image-clip>img,.d-home .d-map:hover .d-map-local,.d-home .d-featured:hover .d-feature-link>img,.d-home .d-menu:hover .d-menu-list img{scale:1.04}
+ .d-home .d-bento>.d-card:focus-visible,.d-home .d-bento>.d-card:has(:focus-visible){outline:2px solid var(--gold-hi);outline-offset:3px;z-index:3;box-shadow:0 14px 32px rgba(0,0,0,.45),0 0 0 1px rgba(215,177,106,.35)}
+}
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:reduce){
+ .d-home .d-bento>.d-card:hover{transform:none}
+ .d-home .d-bento>.d-card:hover img{scale:1}
+}
+@media(prefers-reduced-motion:reduce){
+ .d-home .d-map-pin::after{animation:none}
+ .d-home .d-flavors .d-flavor-letter{transition:none;transform:none;opacity:1}
+ .d-home .d-hours .d-status-dot::after{animation:none}
+}
